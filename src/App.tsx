@@ -11,6 +11,17 @@ function Vertex(props: { x: number; y: number }) {
   );
 }
 
+function Edge(props: { x1: number; y1: number; x2: number; y2: number }) {
+  let x = (props.x1 + props.x2) / 2;
+  let y = (props.y1 + props.y2) / 2;
+  return (
+    <mesh visible position={[x, y, 0]} rotation={[0, 0, 0]}>
+      <boxGeometry attach="geometry" args={[1, 1, 1]} />
+      <meshNormalMaterial attach="material" />
+    </mesh>
+  );
+}
+
 export default function App() {
   let coords = [];
   for (let i = -10; i <= 10; i++) {
@@ -30,6 +41,7 @@ export default function App() {
       <Vertex x={0} y={0} />
       <Vertex x={5} y={0} />
       <Vertex x={10} y={0} />
+      <Edge x1={-10} y1={5} x2={0} y2={0} />
     </Canvas>
   );
 }
