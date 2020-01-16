@@ -29,7 +29,7 @@ function Ball() {
 
 export default function App() {
   return (
-    <Canvas style={{ height: "100vh" }}>
+    <Canvas style={{ height: "100vh", backgroundColor: "#333333" }}>
       <Thing />
       <Ball />
     </Canvas>
