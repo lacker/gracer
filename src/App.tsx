@@ -6,7 +6,7 @@ function Vertex(props: { x: number; y: number }) {
   return (
     <mesh visible position={[props.x, props.y, 0]} rotation={[0, 0, 0]}>
       <sphereGeometry attach="geometry" args={[0.2, 32, 32]} />
-      <meshNormalMaterial attach="material" />
+      <meshLambertMaterial color="#0000ff" attach="material" />
     </mesh>
   );
 }
@@ -14,10 +14,14 @@ function Vertex(props: { x: number; y: number }) {
 function Edge(props: { x1: number; y1: number; x2: number; y2: number }) {
   let x = (props.x1 + props.x2) / 2;
   let y = (props.y1 + props.y2) / 2;
+  let dx = Math.abs(props.x1 - props.x2);
+  let dy = Math.abs(props.y1 - props.y2);
+  let dist = Math.sqrt(dx * dx + dy * dy);
+  let angle = Math.atan2(dy, dx);
   return (
-    <mesh visible position={[x, y, 0]} rotation={[0, 0, 0]}>
-      <boxGeometry attach="geometry" args={[1, 1, 1]} />
-      <meshNormalMaterial attach="material" />
+    <mesh visible position={[x, y, 0]} rotation={[0, 0, -angle]}>
+      <boxGeometry attach="geometry" args={[dist, 0.1, 0.1]} />
+      <meshLambertMaterial color="#777777" attach="material" />
     </mesh>
   );
 }
@@ -31,9 +35,10 @@ export default function App() {
     <Canvas
       resize={{ scroll: false }}
       orthographic
-      style={{ height: "100vh", backgroundColor: "#222222" }}
+      style={{ height: "100vh", backgroundColor: "#eeeeee" }}
       camera={{ zoom: 50 }}
     >
+      <ambientLight intensity={1} />
       {coords.map(y => (
         <Vertex x={-10} y={y} />
       ))}
