@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
 import "./App.css";
 
-function Vertex(props: { x: number; y: number }) {
+function Ball(props: { x: number; y: number }) {
   return (
     <mesh visible position={[props.x, props.y, 0]} rotation={[0, 0, 0]}>
       <sphereGeometry attach="geometry" args={[0.2, 32, 32]} />
@@ -11,7 +11,7 @@ function Vertex(props: { x: number; y: number }) {
   );
 }
 
-function Edge(props: { x1: number; y1: number; x2: number; y2: number }) {
+function Rod(props: { x1: number; y1: number; x2: number; y2: number }) {
   let x = (props.x1 + props.x2) / 2;
   let y = (props.y1 + props.y2) / 2;
   let dx = Math.abs(props.x1 - props.x2);
@@ -41,13 +41,13 @@ export default function App() {
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
       {coords.map(y => (
-        <Vertex x={-10} y={y} />
+        <Ball x={-10} y={y} />
       ))}
-      <Vertex x={-5} y={0} />
-      <Vertex x={0} y={0} />
-      <Vertex x={5} y={0} />
-      <Vertex x={10} y={0} />
-      <Edge x1={-10} y1={5} x2={0} y2={0} />
+      <Ball x={-5} y={0} />
+      <Ball x={0} y={0} />
+      <Ball x={5} y={0} />
+      <Ball x={10} y={0} />
+      <Rod x1={-10} y1={5} x2={0} y2={0} />
     </Canvas>
   );
 }
