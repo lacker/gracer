@@ -30,10 +30,10 @@ function Rod(props: { x1: number; y1: number; x2: number; y2: number }) {
 
 export default function App() {
   let graph = new Graph();
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 10; i++) {
     graph.addRandomVertex();
   }
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 20; i++) {
     graph.addRandomEdge();
   }
 
