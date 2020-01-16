@@ -2,27 +2,11 @@ import React, { useRef } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
 import "./App.css";
 
-function Thing() {
-  let ref: any = useRef();
-  useFrame(() => (ref.current.rotation.x = ref.current.rotation.y += 0.01));
+function Ball(props: { x: number; y: number }) {
   return (
-    <mesh
-      ref={ref}
-      onClick={e => console.log("click")}
-      onPointerOver={e => console.log("hover")}
-      onPointerOut={e => console.log("unhover")}
-    >
-      <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
+    <mesh visible position={[props.x, props.y, -5]} rotation={[0, 0, 0]}>
+      <sphereGeometry attach="geometry" args={[1, 32, 32]} />
       <meshNormalMaterial attach="material" />
-    </mesh>
-  );
-}
-
-function Ball() {
-  return (
-    <mesh visible position={[1, 2, 3]} rotation={[0, 0, 0]}>
-      <sphereGeometry attach="geometry" args={[1, 16, 16]} />
-      <meshStandardMaterial attach="material" color="hotpink" />
     </mesh>
   );
 }
@@ -30,8 +14,15 @@ function Ball() {
 export default function App() {
   return (
     <Canvas style={{ height: "100vh", backgroundColor: "#333333" }}>
-      <Thing />
-      <Ball />
+      <Ball x={-10} y={-10} />
+      <Ball x={-10} y={-5} />
+      <Ball x={-10} y={0} />
+      <Ball x={-10} y={5} />
+      <Ball x={-10} y={10} />
+      <Ball x={-5} y={0} />
+      <Ball x={0} y={0} />
+      <Ball x={5} y={0} />
+      <Ball x={10} y={0} />
     </Canvas>
   );
 }
