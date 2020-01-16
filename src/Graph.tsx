@@ -5,6 +5,8 @@ function randomCoordinate() {
 }
 
 export default class Graph {
+  vertices: Vertex[];
+
   constructor() {
     this.vertices = [];
   }
@@ -36,6 +38,19 @@ export default class Graph {
 
   isEmpty(): boolean {
     return this.vertices.length === 0;
+  }
+
+  edges(): Vertex[][] {
+    let answer = [];
+    for (let i = 0; i < this.vertices.length; i++) {
+      let vertex = this.vertices[i];
+      for (let j of vertex.edges) {
+        if (i < j) {
+          answer.push([vertex, this.vertices[j]]);
+        }
+      }
+    }
+    return answer;
   }
 
   addRandomEdge() {
