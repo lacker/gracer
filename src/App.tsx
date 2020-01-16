@@ -38,7 +38,8 @@ export default function App() {
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
       camera={{ zoom: 50 }}
     >
-      <ambientLight intensity={1} />
+      <pointLight position={[-20, 50, 100]} />
+      <ambientLight intensity={0.5} />
       {coords.map(y => (
         <Vertex x={-10} y={y} />
       ))}
