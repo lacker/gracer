@@ -40,6 +40,7 @@ function randomCoordinate() {
   return -10 + Math.random() * 20;
 }
 
+// A Graph numbers its vertices starting at 0.
 export default class Graph {
   vertices: Vertex[];
 
