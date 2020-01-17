@@ -97,7 +97,7 @@ export default class Graph {
       }
 
       // Cap the force
-      let cap = 0.05;
+      let cap = 0.3;
       if (len(force) > cap) {
         force = scaleTo(cap, force);
       }

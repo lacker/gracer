@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Canvas } from "react-three-fiber";
+import { Canvas, useFrame } from "react-three-fiber";
 import "./App.css";
 
 import Graph from "./Graph";
@@ -28,26 +28,38 @@ function Rod(props: { x1: number; y1: number; x2: number; y2: number }) {
   );
 }
 
-export default function App() {
+function GraphView(props: { graph: Graph }) {
   let [ticks, setTicks] = useState(0);
-  let [graph, setGraph] = useState(() => {
-    let graph = new Graph();
-
-    for (let i = 0; i < 10; i++) {
-      graph.addRandomVertex();
-    }
-    for (let i = 0; i < 20; i++) {
-      graph.addRandomEdge();
-    }
-    return graph;
+  useFrame(() => {
+    props.graph.step();
+    setTicks(ticks + 1);
   });
+  return (
+    <>
+      {props.graph.vertices.map(v => (
+        <Ball x={v.x} y={v.y} key={Math.random()} />
+      ))}
+
+      {props.graph.edges().map(([v1, v2]) => (
+        <Rod x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} key={Math.random()} />
+      ))}
+    </>
+  );
+}
+
+export default function App() {
+  let graph = new Graph();
+  for (let i = 0; i < 10; i++) {
+    graph.addRandomVertex();
+  }
+  for (let i = 0; i < 20; i++) {
+    graph.addRandomEdge();
+  }
 
   return (
     <Canvas
       onClick={() => {
-        graph.step();
-        setGraph(graph);
-        setTicks(ticks + 1);
+        console.log("click");
       }}
       resize={{ scroll: false }}
       orthographic
@@ -56,14 +68,7 @@ export default function App() {
     >
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
-
-      {graph.vertices.map(v => (
-        <Ball x={v.x} y={v.y} key={Math.random()} />
-      ))}
-
-      {graph.edges().map(([v1, v2]) => (
-        <Rod x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} key={Math.random()} />
-      ))}
+      <GraphView graph={graph} />
     </Canvas>
   );
 }
