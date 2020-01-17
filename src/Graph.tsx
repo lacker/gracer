@@ -90,9 +90,10 @@ export default class Graph {
         let idealDiff = scaleTo(1, diff);
         let target = add(neighbor, idealDiff);
 
-        // This is linear rather than quadratic like a real spring
-        let deltaForce = sub(target, vertex);
-        force = add(force, deltaForce);
+        // Scale quadratically like a real spring
+        let delta = sub(target, vertex);
+        let partialForce = scale(len(delta), delta);
+        force = add(force, partialForce);
       }
 
       // Cap the force
@@ -105,6 +106,9 @@ export default class Graph {
 
     // Apply the forces
     for (let i = 0; i < this.vertices.length; i++) {
+      if (len(forces[i]) < 0.001) {
+        continue;
+      }
       let newV = add(this.vertices[i], forces[i]);
       this.vertices[i] = { ...this.vertices[i], ...newV };
     }

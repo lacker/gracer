@@ -1,2 +1,3 @@
 --ignore-dir=is:build
 --ignore-file=is:package-lock.json
+--ignore-file=is:yarn.lock
