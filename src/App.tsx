@@ -3,7 +3,7 @@ import { Canvas, useFrame } from "react-three-fiber";
 import "./App.css";
 
 import Embedding from "./Embedding";
-import Graph from "./Graph";
+import ArbitraryGraph from "./ArbitraryGraph";
 
 function Ball(props: { x: number; y: number }) {
   return (
@@ -49,7 +49,7 @@ function GraphView(props: { embedding: Embedding }) {
 }
 
 export default function App() {
-  let graph = new Graph();
+  let graph = new ArbitraryGraph();
   for (let i = 0; i < 10; i++) {
     graph.addRandomVertex();
   }
