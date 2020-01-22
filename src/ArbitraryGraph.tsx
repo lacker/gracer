@@ -41,14 +41,14 @@ function randomCoordinate() {
 }
 
 export default class ArbitraryGraph implements Graph {
-  vertices: Vertex[];
+  vlist: Vertex[];
 
   constructor() {
-    this.vertices = [];
+    this.vlist = [];
   }
 
   hasEdge(i: number, j: number): boolean {
-    let v = this.vertices[i];
+    let v = this.vlist[i];
     if (!v) {
       return false;
     }
@@ -61,19 +61,19 @@ export default class ArbitraryGraph implements Graph {
   }
 
   chooseVertex(): number {
-    return Math.floor(this.vertices.length * Math.random());
+    return Math.floor(this.vlist.length * Math.random());
   }
 
-  getVertices(): Vector[] {
+  vertices(): Vector[] {
     let answer = [];
-    for (let v of this.vertices) {
+    for (let v of this.vlist) {
       answer.push({ x: v.x, y: v.y });
     }
     return answer;
   }
 
   addRandomVertex() {
-    this.vertices.push({
+    this.vlist.push({
       x: randomCoordinate(),
       y: randomCoordinate(),
       edges: []
@@ -81,17 +81,17 @@ export default class ArbitraryGraph implements Graph {
   }
 
   isEmpty(): boolean {
-    return this.vertices.length === 0;
+    return this.vlist.length === 0;
   }
 
   step(): void {
-    // An array, parallel to this.vertices, of {x, y} forces on them.
+    // An array, parallel to this.vlist, of {x, y} forces on them.
     let forces = [];
 
-    for (let vertex of this.vertices) {
+    for (let vertex of this.vlist) {
       let force = { x: 0, y: 0 };
       for (let index of vertex.edges) {
-        let neighbor = this.vertices[index];
+        let neighbor = this.vlist[index];
 
         // Figure out the target spot where we should be
         let diff = sub(vertex, neighbor);
@@ -105,7 +105,7 @@ export default class ArbitraryGraph implements Graph {
       }
 
       // Cap the force
-      let cap = 0.3;
+      let cap = 0.2;
       if (len(force) > cap) {
         force = scaleTo(cap, force);
       }
@@ -113,23 +113,23 @@ export default class ArbitraryGraph implements Graph {
     }
 
     // Apply the forces
-    for (let i = 0; i < this.vertices.length; i++) {
+    for (let i = 0; i < this.vlist.length; i++) {
       if (len(forces[i]) < 0.001) {
         continue;
       }
-      let newV = add(this.vertices[i], forces[i]);
-      this.vertices[i] = { ...this.vertices[i], ...newV };
+      let newV = add(this.vlist[i], forces[i]);
+      this.vlist[i] = { ...this.vlist[i], ...newV };
     }
   }
 
   // Returns a list of [vertex1, vertex2] edges
   edges(): Vertex[][] {
     let answer = [];
-    for (let i = 0; i < this.vertices.length; i++) {
-      let vertex = this.vertices[i];
+    for (let i = 0; i < this.vlist.length; i++) {
+      let vertex = this.vlist[i];
       for (let j of vertex.edges) {
         if (i < j) {
-          answer.push([vertex, this.vertices[j]]);
+          answer.push([vertex, this.vlist[j]]);
         }
       }
     }
@@ -137,7 +137,7 @@ export default class ArbitraryGraph implements Graph {
   }
 
   addRandomEdge() {
-    if (this.vertices.length < 2) {
+    if (this.vlist.length < 2) {
       return;
     }
 
@@ -147,8 +147,8 @@ export default class ArbitraryGraph implements Graph {
       if (i === j || this.hasEdge(i, j)) {
         continue;
       }
-      this.vertices[i].edges.push(j);
-      this.vertices[j].edges.push(i);
+      this.vlist[i].edges.push(j);
+      this.vlist[j].edges.push(i);
       return;
     }
 

@@ -16,7 +16,7 @@ export default class Embedding {
 
   vertices(): Vector[] {
     let answer = [];
-    for (let v of this.graph.getVertices()) {
+    for (let v of this.graph.vertices()) {
       answer.push({ x: v.x, y: v.y });
     }
     return answer;
