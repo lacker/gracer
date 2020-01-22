@@ -1,23 +1,20 @@
 import Graph from "./Graph";
-import Vector from "./Vector";
 
 // An ArbitraryGraph is one where you can add vertices and edges willy nilly.
 
-function randomCoordinate() {
-  return -10 + Math.random() * 20;
-}
-
 export default class ArbitraryGraph implements Graph {
-  vlist: Vector[];
-  edgelist: number[][];
+  vset: Set<number>;
+  edgemap: Map<number, number[]>;
+  nextv: number;
 
   constructor() {
-    this.vlist = [];
-    this.edgelist = [];
+    this.vset = new Set<number>();
+    this.edgemap = new Map<number, number[]>();
+    this.nextv = 1;
   }
 
   hasEdge(i: number, j: number): boolean {
-    let edges = this.edgelist[i];
+    let edges = this.edgemap.get(i);
     if (!edges) {
       return false;
     }
@@ -30,52 +27,28 @@ export default class ArbitraryGraph implements Graph {
   }
 
   vertices(): number[] {
-    let answer = [];
-    for (let i = 0; i < this.vlist.length; i++) {
-      answer.push(i);
-    }
-    return answer;
+    return Array.from(this.vset);
   }
 
   chooseVertex(): number {
-    return Math.floor(this.vlist.length * Math.random());
+    let choices = Array.from(this.vset);
+    return choices[Math.floor(Math.random() * choices.length)];
   }
 
-  xvertices(): Vector[] {
-    return [...this.vlist];
-  }
-
-  addRandomVertex() {
-    this.vlist.push(new Vector(randomCoordinate(), randomCoordinate()));
-    this.edgelist.push([]);
-  }
-
-  isEmpty(): boolean {
-    return this.vlist.length === 0;
+  addVertex() {
+    this.vset.add(this.nextv);
+    this.edgemap.set(this.nextv, []);
+    this.nextv++;
   }
 
   neighbors(v: number): number[] {
-    return this.edgelist[v];
-  }
-
-  // Returns a list of [vertex1, vertex2] edges
-  xedges(): Vector[][] {
-    let answer = [];
-    for (let i = 0; i < this.vlist.length; i++) {
-      let vertex = this.vlist[i];
-      for (let j of this.edgelist[i]) {
-        if (i < j) {
-          answer.push([vertex, this.vlist[j]]);
-        }
-      }
-    }
-    return answer;
+    return this.edgemap.get(v) || [];
   }
 
   edges(): number[][] {
     let answer = [];
-    for (let i = 0; i < this.vlist.length; i++) {
-      for (let j of this.edgelist[i]) {
+    for (let i of this.vset) {
+      for (let j of this.neighbors(i)) {
         if (i < j) {
           answer.push([i, j]);
         }
@@ -85,7 +58,7 @@ export default class ArbitraryGraph implements Graph {
   }
 
   addRandomEdge() {
-    if (this.vlist.length < 2) {
+    if (this.vset.size < 2) {
       return;
     }
 
@@ -95,8 +68,8 @@ export default class ArbitraryGraph implements Graph {
       if (i === j || this.hasEdge(i, j)) {
         continue;
       }
-      this.edgelist[i].push(j);
-      this.edgelist[j].push(i);
+      this.neighbors(i).push(j);
+      this.neighbors(j).push(i);
       return;
     }
 

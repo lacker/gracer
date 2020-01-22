@@ -9,7 +9,7 @@ export default function App() {
   let makeGraph = () => {
     let graph = new ArbitraryGraph();
     for (let i = 0; i < 20; i++) {
-      graph.addRandomVertex();
+      graph.addVertex();
     }
     for (let i = 0; i < 30; i++) {
       graph.addRandomEdge();
