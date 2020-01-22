@@ -2,26 +2,26 @@ import React, { useState } from "react";
 import { useFrame } from "react-three-fiber";
 
 import Graph from "./Graph";
-import Vector from "./Vector";
 
-function randomCoordinate() {
-  return -10 + Math.random() * 20;
-}
-
-function Ball(props: { x: number; y: number }) {
+function Ball(props: { graph: Graph; vertex: number }) {
+  let v = props.graph.xvertices()[props.vertex];
   return (
-    <mesh visible position={[props.x, props.y, 0]} rotation={[0, 0, 0]}>
+    <mesh visible position={[v.x, v.y, 0]} rotation={[0, 0, 0]}>
       <sphereGeometry attach="geometry" args={[0.2, 32, 32]} />
       <meshLambertMaterial color="#0000ff" attach="material" />
     </mesh>
   );
 }
 
-function Rod(props: { x1: number; y1: number; x2: number; y2: number }) {
-  let x = (props.x1 + props.x2) / 2;
-  let y = (props.y1 + props.y2) / 2;
-  let dx = props.x2 - props.x1;
-  let dy = props.y2 - props.y1;
+function Rod(props: { graph: Graph; edge: number[] }) {
+  let vs = props.graph.xvertices();
+  let [vn1, vn2] = props.edge;
+  let v1 = vs[vn1];
+  let v2 = vs[vn2];
+  let x = (v1.x + v2.x) / 2;
+  let y = (v1.y + v2.y) / 2;
+  let dx = v2.x - v1.x;
+  let dy = v2.y - v1.y;
   let dist = Math.sqrt(dx * dx + dy * dy);
   let angle = Math.atan2(dy, dx);
   return (
@@ -40,12 +40,12 @@ export default function GraphView(props: { graph: Graph }) {
   });
   return (
     <>
-      {props.graph.xvertices().map(v => (
-        <Ball x={v.x} y={v.y} key={Math.random()} />
+      {props.graph.vertices().map(v => (
+        <Ball graph={props.graph} vertex={v} key={Math.random()} />
       ))}
 
-      {props.graph.xedges().map(([v1, v2]) => (
-        <Rod x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} key={Math.random()} />
+      {props.graph.edges().map(e => (
+        <Rod graph={props.graph} edge={e} key={Math.random()} />
       ))}
     </>
   );
