@@ -100,12 +100,12 @@ export default class ArbitraryGraph implements Graph {
 
         // Scale quadratically like a real spring
         let delta = sub(target, vertex);
-        let partialForce = scale(len(delta), delta);
+        let partialForce = scale(0.5 * len(delta), delta);
         force = add(force, partialForce);
       }
 
       // Cap the force
-      let cap = 0.2;
+      let cap = 0.5;
       if (len(force) > cap) {
         force = scaleTo(cap, force);
       }
