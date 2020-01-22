@@ -54,6 +54,10 @@ export default class ArbitraryGraph implements Graph {
     return this.vlist.length === 0;
   }
 
+  neighbors(v: number): number[] {
+    return this.edgelist[v];
+  }
+
   step(): void {
     // An array, parallel to this.vlist, of forces on them.
     let forces = [];

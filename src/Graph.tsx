@@ -9,6 +9,9 @@ export default interface Graph {
   // A list of [int, int] edges
   edges(): number[][];
 
+  // The edges for a vertex
+  neighbors(v: number): number[];
+
   xvertices(): Vector[];
 
   // Returns a list of [vertex1, vertex2] edges
