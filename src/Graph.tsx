@@ -1,8 +1,6 @@
 import Vector from "./Vector";
 
 export default interface Graph {
-  step(): void;
-
   // A list of int ids for the vertices
   vertices(): number[];
 

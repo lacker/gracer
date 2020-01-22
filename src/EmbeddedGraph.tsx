@@ -18,8 +18,20 @@ export default class EmbeddedGraph {
     }
   }
 
+  position(v: number): Vector {
+    let answer = this.positions.get(v);
+    if (!answer) {
+      throw new Error(`no position for vertex ${v}`);
+    }
+    return answer;
+  }
+
   vertices(): number[] {
     return this.graph.vertices();
+  }
+
+  edges(): number[][] {
+    return this.graph.edges();
   }
 
   step(): void {
@@ -27,16 +39,10 @@ export default class EmbeddedGraph {
     let newPositions = new Map<number, Vector>();
 
     for (let vertex of this.vertices()) {
-      let vpos = this.positions.get(vertex);
-      if (!vpos) {
-        throw new Error("bad vpos");
-      }
+      let vpos = this.position(vertex);
       let force = Vector.zero();
       for (let neighbor of this.graph.neighbors(vertex)) {
-        let npos = this.positions.get(neighbor);
-        if (!npos) {
-          throw new Error("bad npos");
-        }
+        let npos = this.position(neighbor);
 
         // Figure out the target spot where we should be
         let diff = vpos.sub(npos);

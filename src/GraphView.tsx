@@ -5,11 +5,11 @@ import * as THREE from "three";
 import EmbeddedGraph from "./EmbeddedGraph";
 import Graph from "./Graph";
 
-function Ball(props: { graph: Graph; vertex: number }) {
-  let v = props.graph.xvertices()[props.vertex];
+function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
+  let v = props.graph.position(props.vertex);
   let mesh = useRef<any>();
   useFrame(() => {
-    let v = props.graph.xvertices()[props.vertex];
+    let v = props.graph.position(props.vertex);
     mesh.current.position.x = v.x;
     mesh.current.position.y = v.y;
   });
@@ -21,12 +21,11 @@ function Ball(props: { graph: Graph; vertex: number }) {
   );
 }
 
-function Rod(props: { graph: Graph; edge: number[] }) {
+function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
   let calculate = () => {
-    let vs = props.graph.xvertices();
     let [vn1, vn2] = props.edge;
-    let v1 = vs[vn1];
-    let v2 = vs[vn2];
+    let v1 = props.graph.position(vn1);
+    let v2 = props.graph.position(vn2);
     let x = (v1.x + v2.x) / 2;
     let y = (v1.y + v2.y) / 2;
     let dx = v2.x - v1.x;
@@ -62,16 +61,16 @@ function Rod(props: { graph: Graph; edge: number[] }) {
 export default function GraphView(props: { graph: Graph }) {
   let embedded = new EmbeddedGraph(props.graph);
   useFrame(() => {
-    props.graph.step();
+    embedded.step();
   });
   return (
     <>
-      {props.graph.vertices().map(v => (
-        <Ball graph={props.graph} vertex={v} key={Math.random()} />
+      {embedded.vertices().map(v => (
+        <Ball graph={embedded} vertex={v} key={Math.random()} />
       ))}
 
-      {props.graph.edges().map(e => (
-        <Rod graph={props.graph} edge={e} key={Math.random()} />
+      {embedded.edges().map(e => (
+        <Rod graph={embedded} edge={e} key={Math.random()} />
       ))}
     </>
   );
