@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Canvas } from "react-three-fiber";
 import "./App.css";
 
@@ -6,16 +6,21 @@ import ArbitraryGraph from "./ArbitraryGraph";
 import GraphView from "./GraphView";
 
 export default function App() {
-  let graph = new ArbitraryGraph();
-  for (let i = 0; i < 10; i++) {
-    graph.addRandomVertex();
-  }
-  for (let i = 0; i < 20; i++) {
-    graph.addRandomEdge();
-  }
+  let makeGraph = () => {
+    let graph = new ArbitraryGraph();
+    for (let i = 0; i < 10; i++) {
+      graph.addRandomVertex();
+    }
+    for (let i = 0; i < 20; i++) {
+      graph.addRandomEdge();
+    }
+    return graph;
+  };
+  let [graph, setGraph] = useState(makeGraph);
 
   return (
     <Canvas
+      onClick={() => setGraph(makeGraph())}
       resize={{ scroll: false }}
       orthographic
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
