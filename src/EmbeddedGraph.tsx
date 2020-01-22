@@ -8,13 +8,17 @@ function randomCoordinate() {
 export default class EmbeddedGraph {
   graph: Graph;
 
-  locations: { [index: number]: Vector };
+  positions: { [index: number]: Vector };
 
   constructor(graph: Graph) {
     this.graph = graph;
-    this.locations = {};
+    this.positions = {};
     for (let v of graph.vertices()) {
-      this.locations[v] = new Vector(randomCoordinate(), randomCoordinate());
+      this.positions[v] = new Vector(randomCoordinate(), randomCoordinate());
     }
+  }
+
+  vertices(): number[] {
+    return this.graph.vertices();
   }
 }
