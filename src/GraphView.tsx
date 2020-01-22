@@ -3,7 +3,6 @@ import { useFrame } from "react-three-fiber";
 import * as THREE from "three";
 
 import EmbeddedGraph from "./EmbeddedGraph";
-import Graph from "./Graph";
 
 function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
   let v = props.graph.position(props.vertex);
@@ -58,19 +57,18 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
   );
 }
 
-export default function GraphView(props: { graph: Graph }) {
-  let embedded = new EmbeddedGraph(props.graph);
+export default function GraphView(props: { graph: EmbeddedGraph }) {
   useFrame(() => {
-    embedded.step();
+    props.graph.step();
   });
   return (
     <>
-      {embedded.vertices().map(v => (
-        <Ball graph={embedded} vertex={v} key={Math.random()} />
+      {props.graph.vertices().map(v => (
+        <Ball graph={props.graph} vertex={v} key={Math.random()} />
       ))}
 
-      {embedded.edges().map(e => (
-        <Rod graph={embedded} edge={e} key={Math.random()} />
+      {props.graph.edges().map(e => (
+        <Rod graph={props.graph} edge={e} key={Math.random()} />
       ))}
     </>
   );

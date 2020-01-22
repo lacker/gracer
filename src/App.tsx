@@ -3,6 +3,7 @@ import { Canvas } from "react-three-fiber";
 import "./App.css";
 
 import ArbitraryGraph from "./ArbitraryGraph";
+import EmbeddedGraph from "./EmbeddedGraph";
 import GraphView from "./GraphView";
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
     return graph;
   };
   let [graph, setGraph] = useState(makeGraph);
+  let embedded = new EmbeddedGraph(graph);
 
   return (
     <Canvas
@@ -28,7 +30,7 @@ export default function App() {
     >
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
-      <GraphView graph={graph} />
+      <GraphView graph={embedded} />
     </Canvas>
   );
 }
