@@ -1,5 +1,3 @@
-import Vector from "./Vector";
-
 export default interface Graph {
   // A list of int ids for the vertices
   vertices(): number[];
