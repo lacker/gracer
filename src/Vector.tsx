@@ -27,7 +27,7 @@ export default class Vector {
     return this.x * other.x + this.y * other.y;
   }
 
-  sub(other: Vector): number {
+  sub(other: Vector): Vector {
     return this.add(other.scale(-1));
   }
 
