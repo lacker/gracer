@@ -7,21 +7,20 @@ function randomCoordinate() {
 
 export default class EmbeddedGraph {
   graph: Graph;
-
   positions: Map<number, Vector>;
+  version: number;
 
   constructor(graph: Graph) {
     this.graph = graph;
     this.positions = new Map();
-    for (let v of graph.vertices()) {
-      this.positions.set(v, new Vector(randomCoordinate(), randomCoordinate()));
-    }
+    this.version = this.graph.version;
   }
 
   position(v: number): Vector {
     let answer = this.positions.get(v);
     if (!answer) {
-      throw new Error(`no position for vertex ${v}`);
+      answer = new Vector(randomCoordinate(), randomCoordinate());
+      this.positions.set(v, answer);
     }
     return answer;
   }
@@ -34,7 +33,14 @@ export default class EmbeddedGraph {
     return this.graph.edges();
   }
 
-  step(): void {
+  // Returns whether the elements have changed
+  step(): boolean {
+    let changed = false;
+    if (this.version !== this.graph.version) {
+      this.version = this.graph.version;
+      changed = true;
+    }
+
     // Update positions in a batch at the end
     let newPositions = new Map<number, Vector>();
 
@@ -70,5 +76,7 @@ export default class EmbeddedGraph {
     for (let [v, pos] of newPositions) {
       this.positions.set(v, pos);
     }
+
+    return changed;
   }
 }

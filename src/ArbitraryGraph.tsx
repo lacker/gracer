@@ -7,10 +7,14 @@ export default class ArbitraryGraph implements Graph {
   edgemap: Map<number, number[]>;
   nextv: number;
 
+  // Ticks up whenever the graph is mutated
+  version: number;
+
   constructor() {
     this.vset = new Set<number>();
     this.edgemap = new Map<number, number[]>();
     this.nextv = 1;
+    this.version = 1;
   }
 
   hasEdge(i: number, j: number): boolean {
@@ -39,6 +43,7 @@ export default class ArbitraryGraph implements Graph {
     this.vset.add(this.nextv);
     this.edgemap.set(this.nextv, []);
     this.nextv++;
+    this.version++;
   }
 
   neighbors(v: number): number[] {
@@ -70,6 +75,7 @@ export default class ArbitraryGraph implements Graph {
       }
       this.neighbors(i).push(j);
       this.neighbors(j).push(i);
+      this.version++;
       return;
     }
 

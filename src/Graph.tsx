@@ -9,4 +9,7 @@ export default interface Graph {
 
   // The edges for a vertex
   neighbors(v: number): number[];
+
+  // A counter that ticks up whenever the graph is mutated
+  version: number;
 }
