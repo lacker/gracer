@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { useFrame } from "react-three-fiber";
 
 import Graph from "./Graph";
+import Vector from "./Vector";
+
+function randomCoordinate() {
+  return -10 + Math.random() * 20;
+}
 
 function Ball(props: { x: number; y: number }) {
   return (
@@ -35,11 +40,11 @@ export default function GraphView(props: { graph: Graph }) {
   });
   return (
     <>
-      {props.graph.vertices().map(v => (
+      {props.graph.xvertices().map(v => (
         <Ball x={v.x} y={v.y} key={Math.random()} />
       ))}
 
-      {props.graph.edges().map(([v1, v2]) => (
+      {props.graph.xedges().map(([v1, v2]) => (
         <Rod x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} key={Math.random()} />
       ))}
     </>

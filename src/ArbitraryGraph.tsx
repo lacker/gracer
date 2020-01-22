@@ -29,11 +29,19 @@ export default class ArbitraryGraph implements Graph {
     return false;
   }
 
+  vertices(): number[] {
+    let answer = [];
+    for (let i = 0; i < this.vlist.length; i++) {
+      answer.push(i);
+    }
+    return answer;
+  }
+
   chooseVertex(): number {
     return Math.floor(this.vlist.length * Math.random());
   }
 
-  vertices(): Vector[] {
+  xvertices(): Vector[] {
     return [...this.vlist];
   }
 
@@ -86,13 +94,25 @@ export default class ArbitraryGraph implements Graph {
   }
 
   // Returns a list of [vertex1, vertex2] edges
-  edges(): Vector[][] {
+  xedges(): Vector[][] {
     let answer = [];
     for (let i = 0; i < this.vlist.length; i++) {
       let vertex = this.vlist[i];
       for (let j of this.edgelist[i]) {
         if (i < j) {
           answer.push([vertex, this.vlist[j]]);
+        }
+      }
+    }
+    return answer;
+  }
+
+  edges(): number[][] {
+    let answer = [];
+    for (let i = 0; i < this.vlist.length; i++) {
+      for (let j of this.edgelist[i]) {
+        if (i < j) {
+          answer.push([i, j]);
         }
       }
     }
