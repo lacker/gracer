@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useFrame } from "react-three-fiber";
 import * as THREE from "three";
 
+import EmbeddedGraph from "./EmbeddedGraph";
 import Graph from "./Graph";
 
 function Ball(props: { graph: Graph; vertex: number }) {
@@ -59,6 +60,7 @@ function Rod(props: { graph: Graph; edge: number[] }) {
 }
 
 export default function GraphView(props: { graph: Graph }) {
+  let embedded = new EmbeddedGraph(props.graph);
   useFrame(() => {
     props.graph.step();
   });
