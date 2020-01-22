@@ -16,9 +16,6 @@ export default function App() {
 
   return (
     <Canvas
-      onClick={() => {
-        console.log("click");
-      }}
       resize={{ scroll: false }}
       orthographic
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
