@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Canvas, useFrame } from "react-three-fiber";
 import "./App.css";
 
-import Embedding from "./Embedding";
 import ArbitraryGraph from "./ArbitraryGraph";
+import Graph from "./Graph";
 
 function Ball(props: { x: number; y: number }) {
   return (
@@ -29,19 +29,19 @@ function Rod(props: { x1: number; y1: number; x2: number; y2: number }) {
   );
 }
 
-function GraphView(props: { embedding: Embedding }) {
+function GraphView(props: { graph: Graph }) {
   let [ticks, setTicks] = useState(0);
   useFrame(() => {
-    props.embedding.step();
+    props.graph.step();
     setTicks(ticks + 1);
   });
   return (
     <>
-      {props.embedding.vertices().map(v => (
+      {props.graph.vertices().map(v => (
         <Ball x={v.x} y={v.y} key={Math.random()} />
       ))}
 
-      {props.embedding.edges().map(([v1, v2]) => (
+      {props.graph.edges().map(([v1, v2]) => (
         <Rod x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} key={Math.random()} />
       ))}
     </>
@@ -56,7 +56,6 @@ export default function App() {
   for (let i = 0; i < 20; i++) {
     graph.addRandomEdge();
   }
-  let embedding = new Embedding(graph);
 
   return (
     <Canvas
@@ -70,7 +69,7 @@ export default function App() {
     >
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
-      <GraphView embedding={embedding} />
+      <GraphView graph={graph} />
     </Canvas>
   );
 }
