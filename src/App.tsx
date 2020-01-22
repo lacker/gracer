@@ -8,10 +8,10 @@ import GraphView from "./GraphView";
 export default function App() {
   let makeGraph = () => {
     let graph = new ArbitraryGraph();
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       graph.addRandomVertex();
     }
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       graph.addRandomEdge();
     }
     return graph;
