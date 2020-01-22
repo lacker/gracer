@@ -1,4 +1,4 @@
-type Vector = { x: number; y: number };
+import Vector from "./Vector";
 
 export default interface Graph {
   step(): void;
