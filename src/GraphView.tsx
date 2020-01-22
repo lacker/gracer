@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useFrame } from "react-three-fiber";
 import * as THREE from "three";
 
@@ -9,12 +9,15 @@ function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
   let mesh = useRef<any>();
   useFrame(() => {
     let v = props.graph.position(props.vertex);
+    if (!mesh.current) {
+      return;
+    }
     mesh.current.position.x = v.x;
     mesh.current.position.y = v.y;
   });
   return (
     <mesh ref={mesh} visible position={[v.x, v.y, 0]} rotation={[0, 0, 0]}>
-      <sphereGeometry attach="geometry" args={[0.2, 32, 32]} />
+      <sphereGeometry attach="geometry" args={[0.2, 8, 8]} />
       <meshLambertMaterial color="#0000ff" attach="material" />
     </mesh>
   );
@@ -37,6 +40,9 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
   let { x, y, angle, geometry } = calculate();
   let mesh = useRef<any>();
   useFrame(() => {
+    if (!mesh.current) {
+      return;
+    }
     let { x, y, angle, geometry } = calculate();
     mesh.current.position.x = x;
     mesh.current.position.y = y;
@@ -58,17 +64,20 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
 }
 
 export default function GraphView(props: { graph: EmbeddedGraph }) {
+  let [ticks, setTicks] = useState(0);
   useFrame(() => {
-    props.graph.step();
+    if (props.graph.step()) {
+      setTicks(ticks + 1);
+    }
   });
   return (
     <>
       {props.graph.vertices().map(v => (
-        <Ball graph={props.graph} vertex={v} key={Math.random()} />
+        <Ball graph={props.graph} vertex={v} key={`v${v}`} />
       ))}
 
       {props.graph.edges().map(e => (
-        <Rod graph={props.graph} edge={e} key={Math.random()} />
+        <Rod graph={props.graph} edge={e} key={`e${e.join("-")}`} />
       ))}
     </>
   );

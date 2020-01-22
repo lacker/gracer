@@ -22,7 +22,14 @@ export default function App() {
 
   return (
     <Canvas
-      onClick={() => setGraph(makeGraph())}
+      onClick={() => {
+        if (graph.vertices().length >= 100) {
+          setGraph(makeGraph());
+        } else {
+          graph.addVertex();
+          graph.addRandomEdge();
+        }
+      }}
       resize={{ scroll: false }}
       orthographic
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
