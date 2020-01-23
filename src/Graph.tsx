@@ -5,7 +5,7 @@ export default interface Graph {
   // A list of [int, int] edges
   edges(): number[][];
 
-  // The edges for a vertex
+  // The neighboring vertices for a given vertex
   neighbors(v: number): number[];
 
   // A counter that ticks up whenever the graph is mutated
