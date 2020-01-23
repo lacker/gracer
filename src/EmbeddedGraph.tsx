@@ -57,9 +57,24 @@ export default class EmbeddedGraph {
     // Update positions in a batch at the end
     let newPositions = new Map<number, Vector>();
 
+    // Calculate center of mass
+    let sum = Vector.zero();
+    let num = 0;
+    for (let v of this.vertices()) {
+      sum = sum.add(this.position(v));
+      num++;
+    }
+    let center = sum.scale(1 / num);
+
     for (let vertex of this.vertices()) {
       let vpos = this.position(vertex);
+
+      // Start out with a small force towards the center of the graph, plus
+      // a force away from the center of mass.
       let force = vpos.scaleTo(-0.001);
+      let outwards = vpos.sub(center);
+      force = force.add(outwards.scaleTo(0.005));
+
       for (let neighbor of this.graph.neighbors(vertex)) {
         let npos = this.position(neighbor);
 

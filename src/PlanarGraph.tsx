@@ -245,25 +245,37 @@ export default class PlanarGraph implements Graph {
   }
 
   randomlyExpand() {
-    while (true) {
-      if (Math.random() < 0.5) {
-        // Add a vertex
-        let [v1, v2] = this.randomEdge();
-        this.addVertex(v1, v2);
-        return;
+    let [v1, v2] = this.randomEdge();
+    let v1map = this.edgemap.get(v1);
+    if (!v1map) {
+      throw new Error("no v1map");
+    }
+    let edge = v1map.get(v2);
+    if (!edge) {
+      throw new Error("no edge");
+    }
+    let faces: number[];
+    if (Math.random() < 0.5) {
+      faces = [edge.left, edge.right];
+    } else {
+      faces = [edge.right, edge.left];
+    }
+    for (let face of faces) {
+      if (face === 0) {
+        continue;
       }
-
-      // Split a face if the face is splittable
-      let face = this.randomFace();
       let boundary = this.facemap.get(face);
       if (!boundary || boundary.length < 4) {
         // Unsplittable
         continue;
       }
       let index1 = Math.floor(boundary.length * Math.random());
+      // TODO: make it random rather than always triangle
       let index2 = (index1 + 2) % boundary.length;
       this.addEdge(boundary[index1], boundary[index2], face);
       return;
     }
+
+    this.addVertex(v1, v2);
   }
 }
