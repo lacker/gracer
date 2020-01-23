@@ -42,6 +42,26 @@ export default class PlanarGraph implements Graph {
     this.version = 1;
   }
 
+  vertices(): number[] {
+    return Array.from(this.vset);
+  }
+
+  neighbors(v: number): number[] {
+    return this.edgemap.get(v) || [];
+  }
+
+  edges(): number[][] {
+    let answer = [];
+    for (let i of this.vset) {
+      for (let j of this.neighbors(i)) {
+        if (i < j) {
+          answer.push([i, j]);
+        }
+      }
+    }
+    return answer;
+  }
+
   // Adds a vertex in the given face, with two neighbors.
   addVertex(face: number, n1: number, n2: number) {}
 }
