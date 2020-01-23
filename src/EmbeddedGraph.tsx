@@ -1,10 +1,6 @@
 import Graph from "./Graph";
 import Vector from "./Vector";
 
-function randomCoordinate() {
-  return -10 + Math.random() * 20;
-}
-
 export default class EmbeddedGraph {
   graph: Graph;
   positions: Map<number, Vector>;
@@ -19,7 +15,24 @@ export default class EmbeddedGraph {
   position(v: number): Vector {
     let answer = this.positions.get(v);
     if (!answer) {
-      answer = new Vector(randomCoordinate(), randomCoordinate());
+      // Estimate a position by averaging the neighbors
+      let num = 0;
+      let sum = Vector.zero();
+      for (let neighbor of this.graph.neighbors(v)) {
+        let pos = this.positions.get(neighbor);
+        if (!pos) {
+          continue;
+        }
+        num++;
+        sum = sum.add(pos);
+      }
+      if (num >= 2) {
+        answer = sum.scale(1 / num).add(Vector.epsilon());
+      } else if (num === 1) {
+        answer = Vector.random();
+      } else {
+        answer = Vector.zero();
+      }
       this.positions.set(v, answer);
     }
     return answer;
@@ -46,7 +59,7 @@ export default class EmbeddedGraph {
 
     for (let vertex of this.vertices()) {
       let vpos = this.position(vertex);
-      let force = Vector.zero();
+      let force = vpos.scaleTo(-0.001);
       for (let neighbor of this.graph.neighbors(vertex)) {
         let npos = this.position(neighbor);
 

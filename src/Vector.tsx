@@ -12,7 +12,11 @@ export default class Vector {
   }
 
   static epsilon(): Vector {
-    return new Vector(0.0001, 0.0001);
+    return new Vector(0.01 * Math.random(), 0.01 * Math.random());
+  }
+
+  static random(): Vector {
+    return new Vector(-10 + 20 * Math.random(), -10 + 20 * Math.random());
   }
 
   add(other: Vector): Vector {
