@@ -29,17 +29,43 @@ export default class PlanarGraph implements Graph {
   //     2---3
   //
   constructor() {
-    this.vset = new Set(1, 2, 3);
-    this.nextv = 4;
+    this.nextv = 1;
+    this.vset = new Set();
+    this.addRawVertex();
+    this.addRawVertex();
+    this.addRawVertex();
+
     this.facemap = new Map();
-    this.facemap.set(0, [1, 2, 3]);
-    this.facemap.set(1, [1, 3, 2]);
-    this.nextf = 2;
+    this.nextf = 0;
+    this.addRawFace([1, 2, 3]);
+    this.addRawFace([3, 2, 1]);
+
     this.edgemap = new Map();
-    this.edgemap.set(1, [2, 3]);
-    this.edgemap.set(2, [1, 3]);
-    this.edgemap.set(3, [1, 2]);
+    this.addRawEdge(1, 2);
+    this.addRawEdge(2, 3);
+    this.addRawEdge(3, 1);
+
     this.version = 1;
+  }
+
+  // The addRaw functions don't maintain vertex/edge/face consistency
+
+  addRawVertex(): number {
+    let answer = this.nextv;
+    this.vset.add(answer);
+    this.edgemap.set(answer, []);
+    this.nextv++;
+    return answer;
+  }
+
+  addRawEdge(v1: number, v2: number) {
+    this.neighbors(v1).push(v2);
+    this.neighbors(v2).push(v1);
+  }
+
+  addRawFace(boundary: number[]) {
+    this.facemap.set(this.nextf, boundary);
+    this.nextf++;
   }
 
   vertices(): number[] {
@@ -63,5 +89,12 @@ export default class PlanarGraph implements Graph {
   }
 
   // Adds a vertex in the given face, with two neighbors.
-  addVertex(face: number, n1: number, n2: number) {}
+  addVertex(face: number, n1: number, n2: number) {
+    let circle = this.facemap.get(face);
+    if (!circle) {
+      throw new Error(`no face ${face}`);
+    }
+    let i1 = circle.indexOf(n1);
+    let i2 = circle;
+  }
 }

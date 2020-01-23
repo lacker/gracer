@@ -5,6 +5,7 @@ import "./App.css";
 import ArbitraryGraph from "./ArbitraryGraph";
 import EmbeddedGraph from "./EmbeddedGraph";
 import GraphView from "./GraphView";
+import PlanarGraph from "./PlanarGraph";
 
 export default function App() {
   let makeGraph = () => {
