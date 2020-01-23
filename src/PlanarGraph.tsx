@@ -29,6 +29,15 @@ function chopCircle(circle: number[], first: number, last: number): number[] {
   }
 }
 
+// Mutates circle
+function insertAfter(circle: number[], item: number, after: number) {
+  let index = circle.indexOf(after);
+  if (index < 0) {
+    throw new Error("bad insert");
+  }
+  circle.splice(index + 1, 0, item);
+}
+
 function pairs(list: number[]): number[][] {
   let answer: number[][] = [];
   for (let i = 1; i < list.length; i++) {
@@ -105,25 +114,40 @@ export default class PlanarGraph implements Graph {
     return blank;
   }
 
+  log() {
+    for (let [v1, v1map] of this.edgemap.entries()) {
+      for (let [v2, edge] of v1map.entries()) {
+        console.log(`${v1}-${v2} L${edge.left} R${edge.right}`);
+      }
+    }
+
+    for (let [face, boundary] of this.facemap.entries()) {
+      console.log(`face ${face}: ${boundary.join(",")}`);
+    }
+  }
+
+  addRawFace(boundary: number[]): number {
+    let face = this.nextf;
+    this.nextf++;
+    this.setRawFace(face, boundary);
+    return face;
+  }
+
   // Adds a face, overwriting other face information.
   // This creates edges when it needs to, inserting -1 for unknown faces.
-  addRawFace(boundary: number[]): number {
+  setRawFace(face: number, boundary: number[]) {
     if (boundary.length < 3) {
       throw new Error(`face too small: ${boundary}`);
     }
-
-    let face = this.nextf;
-    this.nextf++;
 
     this.facemap.set(face, boundary);
 
     for (let [v1, v2] of pairs(boundary)) {
       let e1to2 = this.getOrCreateEdge(v1, v2);
       e1to2.right = face;
-      let e2to1 = this.getOrCreateEdge(v2, v2);
+      let e2to1 = this.getOrCreateEdge(v2, v1);
       e2to1.left = face;
     }
-    return face;
   }
 
   vertices(): number[] {
@@ -150,6 +174,52 @@ export default class PlanarGraph implements Graph {
     return Array.from(vmap.keys());
   }
 
+  // Adds a new vertex on the edge between two vertices that are currently connected.
+  addVertex(v1: number, v2: number): number {
+    // Remove the old edge, tracking left and right.
+    let v1map = this.edgemap.get(v1);
+    let v2map = this.edgemap.get(v2);
+    if (!v1map || !v2map) {
+      throw new Error("bad vertex in addVertex");
+    }
+    let e1to2 = v1map.get(v2);
+    let e2to1 = v2map.get(v1);
+    if (!e1to2 || !e2to1) {
+      throw new Error("no edge to split");
+    }
+    let { left, right } = e1to2;
+    if (e2to1.left !== right || e2to1.right !== left) {
+      throw new Error(
+        `${v1}-${v2} is ${JSON.stringify(e1to2)}` +
+          ` but ${v2}-${v1} is ${JSON.stringify(e2to1)}`
+      );
+    }
+    v1map.delete(v2);
+    v2map.delete(v1);
+    let newV = this.addRawVertex();
+
+    // On the right face, the new vertex is after v1
+    let rightBoundary = this.facemap.get(right);
+    if (!rightBoundary) {
+      throw new Error("missing right boundary");
+    }
+    let newRightBoundary = [...rightBoundary];
+    insertAfter(newRightBoundary, newV, v1);
+    this.setRawFace(right, newRightBoundary);
+
+    // On the left face, the new vertex is after v2
+    let leftBoundary = this.facemap.get(left);
+    if (!leftBoundary) {
+      throw new Error("missing left boundary");
+    }
+    let newLeftBoundary = [...leftBoundary];
+    insertAfter(newLeftBoundary, newV, v2);
+    this.setRawFace(left, newLeftBoundary);
+
+    this.version++;
+    return newV;
+  }
+
   // Adds an edge to split the given face, between the given two vertices.
   addEdge(v1: number, v2: number, face: number) {
     let circle = this.facemap.get(face);
@@ -161,5 +231,6 @@ export default class PlanarGraph implements Graph {
     this.addRawFace(from1to2);
     this.addRawFace(from2to1);
     this.facemap.delete(face);
+    this.version++;
   }
 }
