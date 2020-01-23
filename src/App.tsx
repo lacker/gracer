@@ -13,9 +13,7 @@ export default function App() {
   return (
     <Canvas
       onClick={() => {
-        let edges = graph.edges();
-        let [v1, v2] = edges[Math.floor(edges.length * Math.random())];
-        graph.addVertex(v1, v2);
+        graph.randomlyExpand();
         // graph.log();
       }}
       resize={{ scroll: false }}

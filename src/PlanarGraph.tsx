@@ -233,4 +233,37 @@ export default class PlanarGraph implements Graph {
     this.facemap.delete(face);
     this.version++;
   }
+
+  randomFace(): number {
+    let faces = Array.from(this.facemap.keys());
+    return faces[Math.floor(Math.random() * faces.length)];
+  }
+
+  randomEdge(): number[] {
+    let all = this.edges();
+    return all[Math.floor(Math.random() * all.length)];
+  }
+
+  randomlyExpand() {
+    while (true) {
+      if (Math.random() < 0.5) {
+        // Add a vertex
+        let [v1, v2] = this.randomEdge();
+        this.addVertex(v1, v2);
+        return;
+      }
+
+      // Split a face if the face is splittable
+      let face = this.randomFace();
+      let boundary = this.facemap.get(face);
+      if (!boundary || boundary.length < 4) {
+        // Unsplittable
+        continue;
+      }
+      let index1 = Math.floor(boundary.length * Math.random());
+      let index2 = (index1 + 2) % boundary.length;
+      this.addEdge(boundary[index1], boundary[index2], face);
+      return;
+    }
+  }
 }
