@@ -95,6 +95,8 @@ export default class PlanarGraph implements Graph {
       throw new Error(`no face ${face}`);
     }
     let i1 = circle.indexOf(n1);
-    let i2 = circle;
+    let i2 = circle.indexOf(n2);
+
+    // TODO: more
   }
 }
