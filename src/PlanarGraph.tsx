@@ -224,14 +224,21 @@ export default class PlanarGraph implements Graph {
     return newV;
   }
 
-  // Adds an edge to split the given face, between the given two vertices.
+  // Adds an edge to split the given face, between the given two
+  // vertices.
+  // The longer of the two keeps the existing face number.
   addEdge(v1: number, v2: number, face: number) {
     let circle = this.getBoundary(face);
     let from1to2 = chopCircle(circle, v1, v2);
     let from2to1 = chopCircle(circle, v2, v1);
-    this.addRawFace(from1to2);
-    this.addRawFace(from2to1);
-    this.facemap.delete(face);
+    let longer, shorter;
+    if (from1to2.length < from2to1.length) {
+      [longer, shorter] = [from2to1, from1to2];
+    } else {
+      [longer, shorter] = [from1to2, from2to1];
+    }
+    this.addRawFace(shorter);
+    this.setRawFace(face, longer);
     this.version++;
   }
 
@@ -269,6 +276,7 @@ export default class PlanarGraph implements Graph {
     return intersect(left, right).length === 2;
   }
 
+  // TODO: make this work with the outer face
   removeEdge(v1: number, v2: number) {
     let edge = this.getEdge(v1, v2);
     let left = this.getBoundary(edge.left);
