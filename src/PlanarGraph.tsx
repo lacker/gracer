@@ -59,6 +59,20 @@ function pairs(list: number[]): number[][] {
   return answer;
 }
 
+// Zero is the best achievable score for a vertex.
+// The ideal, "flat" state of a vertex is to have degree 5 or 6.
+// Being on the outer face counts for 2 degree, so the ideal degree
+// of a vertex on the outer face is 3 or 4.
+function scoreForPseudodegree(pd: number): number {
+  if (pd < 5) {
+    return pd - 5;
+  }
+  if (pd > 6) {
+    return 6 - pd;
+  }
+  return 0;
+}
+
 // PlanarGraph has some minimum requirements for its graphs.
 // The graph must be connected.
 // Each face must have at least three vertices, including the outer face.
@@ -303,6 +317,9 @@ export default class PlanarGraph implements Graph {
   }
 
   canRemoveEdge(v1: number, v2: number): boolean {
+    if (!this.hasEdge(v1, v2)) {
+      return false;
+    }
     let edge = this.getEdge(v1, v2);
     let left = this.getBoundary(edge.left);
     let right = this.getBoundary(edge.right);
@@ -352,63 +369,105 @@ export default class PlanarGraph implements Graph {
   }
 
   // Keeping the same face as v1->v2's right, return the next vertex
-  // along the boundary.
-  nextVertexUsingRightHandRule(v1: number, v2: number): number {
-    let edge = this.getEdge(v1, v2);
-    let boundary = this.getBoundary(edge.right);
-    let i2 = boundary.indexOf(v2);
-    let index = (i2 + 1) & boundary.length;
-    return boundary[index];
+  nextVertex(face: number, v: number): number {
+    let boundary = this.getBoundary(face);
+    let index = boundary.indexOf(v);
+    if (index < 0) {
+      throw new Error("bad nextVertex call");
+    }
+    let nextIndex = (index + 1) % boundary.length;
+    return boundary[nextIndex];
   }
 
-  tryToRandomlySplitFace(face: number): boolean {
-    let boundary = this.getBoundary(face);
-    if (boundary.length < 4) {
-      return false;
+  // Being on the outer face counts as +2, for pseudodegree
+  pseudodegree(v: number): number {
+    let answer = this.degree(v);
+    if (this.getBoundary(0).includes(v)) {
+      answer += 2;
     }
-    if (face === 0 && boundary.length < 6) {
-      return false;
+    return answer;
+  }
+
+  // Whether a new v1-v3 edge would be good according to curvature.
+  // The higher the score, the better it is to add an edge.
+  // Zero means we are indifferent.
+  // v1-v2-v3 should be a path where face is on their right.
+  scoreToAddEdge(face: number, v1: number, v2: number, v3: number): number {
+    let score = 0;
+    let d1 = this.pseudodegree(v1);
+    score += scoreForPseudodegree(d1 + 1) - scoreForPseudodegree(d1);
+    let d3 = this.pseudodegree(v3);
+    score += scoreForPseudodegree(d3 + 1) - scoreForPseudodegree(d3);
+    if (face === 0) {
+      // v2 would lose 2 pseudodegree with this edge, because it would
+      // no longer be on the outer face.
+      let d2 = this.pseudodegree(v2);
+      score += scoreForPseudodegree(d2 - 2) - scoreForPseudodegree(d2);
     }
-    let index1 = Math.floor(boundary.length * Math.random());
-    // Split into a triangle and one other part.
-    let index2 = (index1 + 2) % boundary.length;
-    if (this.hasEdge(boundary[index1], boundary[index2])) {
-      return false;
+    return score;
+  }
+
+  // Whether removing the v1-v3 edge would be good according to
+  // curvature.
+  // The higher the score, the better it is to remove the edge.
+  // Zero means we are indifferent.
+  // v1-v2-v3 should be a path where face is on their right.
+  scoreToRemoveEdge(face: number, v1: number, v2: number, v3: number): number {
+    let score = 0;
+    let d1 = this.pseudodegree(v1);
+    score += scoreForPseudodegree(d1 - 1) - scoreForPseudodegree(d1);
+    let d3 = this.pseudodegree(v3);
+    score += scoreForPseudodegree(d3 - 1) - scoreForPseudodegree(d3);
+
+    let edge = this.getEdge(v1, v3);
+    if (edge.left !== face) {
+      throw new Error("logic error");
     }
-    console.log(`splitting face ${face}`);
-    this.addEdge(boundary[index1], boundary[index2], face);
-    this.check();
-    return true;
+    if (edge.right === 0) {
+      // v2 would gain 2 pseudodegree with this edge, because it would
+      // now be on the outer face.
+      let d2 = this.pseudodegree(v2);
+      score += scoreForPseudodegree(d2 + 2) - scoreForPseudodegree(d2);
+    }
+    return score;
+  }
+
+  addRandomVertex() {
+    let [v1, v2] = this.randomEdge();
+    this.addVertex(v1, v2);
   }
 
   randomlyMutate() {
-    let [v1, v2] = this.randomEdge();
-
-    if (Math.random() && this.canRemoveEdge(v1, v2)) {
-      this.removeEdge(v1, v2);
-      this.check();
+    if (Math.random() < 0.05) {
+      this.addRandomVertex();
       return;
     }
 
-    let edge = this.getEdge(v1, v2);
-    let faces: number[];
-    if (Math.random() < 0.5) {
-      faces = [edge.left, edge.right];
-    } else {
-      faces = [edge.right, edge.left];
-    }
+    for (let i = 0; i < 50; i++) {
+      let [v1, v2] = this.randomEdge();
+      let edge = this.getEdge(v1, v2);
+      let face = edge.right;
+      let v3 = this.nextVertex(face, v2);
 
-    for (let face of faces) {
-      if (this.tryToRandomlySplitFace(face)) {
+      if (this.canRemoveEdge(v1, v3)) {
+        this.removeEdge(v1, v3);
         return;
       }
+
+      if (this.hasEdge(v1, v3)) {
+        continue;
+      }
+
+      if (face === 0 && this.degree(v2) < 5) {
+        continue;
+      }
+
+      console.log(`adding edge ${v1}-${v3}`);
+      this.addEdge(v1, v3, face);
+      return;
     }
 
-    if (this.canRemoveEdge(v1, v2)) {
-      this.removeEdge(v1, v2);
-    } else {
-      this.addVertex(v1, v2);
-    }
-    this.check();
+    console.log("can't find an edge tweak");
+    this.addRandomVertex();
   }
 }
