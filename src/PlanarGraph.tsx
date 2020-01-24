@@ -313,17 +313,16 @@ export default class PlanarGraph implements Graph {
   }
 
   tryToRandomlySplitFace(face: number): boolean {
-    if (face === 0) {
-      return false;
-    }
     let boundary = this.getBoundary(face);
     if (boundary.length < 4) {
       return false;
     }
+    if (face === 0) {
+      return false;
+    }
     let index1 = Math.floor(boundary.length * Math.random());
-    // Get as close to splitting in half as possible.
-    let offset = Math.floor(boundary.length / 2);
-    let index2 = (index1 + offset) % boundary.length;
+    // Split into a triangle and one other part.
+    let index2 = (index1 + 2) % boundary.length;
     this.addEdge(boundary[index1], boundary[index2], face);
     return true;
   }
