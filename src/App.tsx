@@ -13,7 +13,7 @@ export default function App() {
   return (
     <Canvas
       onClick={() => {
-        graph.randomlyExpand();
+        graph.randomlyMutate();
         // graph.log();
       }}
       resize={{ scroll: false }}
