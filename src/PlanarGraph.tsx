@@ -266,7 +266,7 @@ export default class PlanarGraph implements Graph {
     let edge = this.getEdge(v1, v2);
     let left = this.getBoundary(edge.left);
     let right = this.getBoundary(edge.right);
-    return intersect(left, right).length == 2;
+    return intersect(left, right).length === 2;
   }
 
   removeEdge(v1: number, v2: number) {
