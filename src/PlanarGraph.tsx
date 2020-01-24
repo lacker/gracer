@@ -1,5 +1,3 @@
-import Graph from "./Graph";
-
 type Edge = {
   left: number;
   right: number;
@@ -80,7 +78,7 @@ function scoreForPseudodegree(pd: number): number {
 // Two vertices may be connected by at most one edge.
 // The minimum PlanarGraph is thus a triangle.
 // A PlanarGraph with faces filled in is topologically a 2-sphere.
-export default class PlanarGraph implements Graph {
+export default class PlanarGraph {
   // If v1 -> v2 is an edge, edgemap[v1][v2] is information about it
   edgemap: Map<number, Map<number, Edge>>;
   nextv: number;
@@ -368,6 +366,22 @@ export default class PlanarGraph implements Graph {
     }
   }
 
+  shuffleEdges(): number[][] {
+    let half = this.edges();
+    let answer: number[][] = [];
+    for (let [v1, v2] of half) {
+      answer.push([v1, v2]);
+      answer.push([v2, v1]);
+    }
+    for (let i = answer.length - 1; i > 0; --i) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let tmp = answer[i];
+      answer[i] = answer[j];
+      answer[j] = tmp;
+    }
+    return answer;
+  }
+
   // Keeping the same face as v1->v2's right, return the next vertex
   nextVertex(face: number, v: number): number {
     let boundary = this.getBoundary(face);
@@ -403,7 +417,7 @@ export default class PlanarGraph implements Graph {
       // no longer be on the outer face.
       let d2 = this.pseudodegree(v2);
       score += scoreForPseudodegree(d2 - 2) - scoreForPseudodegree(d2);
-    } else if (this.getBoundary(face).length > 4) {
+    } else if (this.getBoundary(face).length > 5) {
       score += 1;
     }
     return score;
@@ -427,7 +441,7 @@ export default class PlanarGraph implements Graph {
       // now be on the outer face.
       let d2 = this.pseudodegree(v2);
       score += scoreForPseudodegree(d2 + 2) - scoreForPseudodegree(d2);
-    } else if (this.getBoundary(edge.right).length >= 4) {
+    } else if (this.getBoundary(edge.right).length >= 5) {
       score -= 1;
     }
     return score;
@@ -439,19 +453,19 @@ export default class PlanarGraph implements Graph {
   }
 
   randomlyMutate() {
-    if (Math.random() < 0.1) {
+    if (Math.random() < 0.05) {
       this.addRandomVertex();
       return;
     }
 
-    for (let i = 0; i < 100; i++) {
-      let [v1, v2] = this.randomEdge();
+    let edges = this.shuffleEdges();
+    for (let [v1, v2] of edges) {
       let edge = this.getEdge(v1, v2);
       let face = edge.right;
       let v3 = this.nextVertex(face, v2);
 
       if (this.canRemoveEdge(v1, v3)) {
-        if (this.scoreToRemoveEdge(face, v1, v2, v3) > 0) {
+        if (this.scoreToRemoveEdge(face, v1, v2, v3) >= 0) {
           this.removeEdge(v1, v3);
           return;
         }
@@ -465,7 +479,7 @@ export default class PlanarGraph implements Graph {
         continue;
       }
 
-      if (this.scoreToAddEdge(face, v1, v2, v3) > 0) {
+      if (this.scoreToAddEdge(face, v1, v2, v3) >= 0) {
         console.log(`adding edge ${v1}-${v3}`);
         this.addEdge(v1, v3, face);
         return;

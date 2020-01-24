@@ -1,12 +1,12 @@
-import Graph from "./Graph";
+import PlanarGraph from "./PlanarGraph";
 import Vector from "./Vector";
 
 export default class EmbeddedGraph {
-  graph: Graph;
+  graph: PlanarGraph;
   positions: Map<number, Vector>;
   version: number;
 
-  constructor(graph: Graph) {
+  constructor(graph: PlanarGraph) {
     this.graph = graph;
     this.positions = new Map();
     this.version = this.graph.version;
