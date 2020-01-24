@@ -276,7 +276,6 @@ export default class PlanarGraph implements Graph {
     return intersect(left, right).length === 2;
   }
 
-  // TODO: make this work with the outer face
   removeEdge(v1: number, v2: number) {
     let edge = this.getEdge(v1, v2);
     let left = this.getBoundary(edge.left);
@@ -287,13 +286,15 @@ export default class PlanarGraph implements Graph {
     this.getVertexMap(v2).delete(v1);
 
     // Create a new face by zipping left and right together
+    // Reuse the lower face id so it works with the outer face
+    let newFace = Math.min(edge.left, edge.right);
     let leftPart = chopCircle(left, v1, v2);
     leftPart.pop();
     let rightPart = chopCircle(right, v2, v1);
     rightPart.pop();
     let newBoundary = leftPart.concat(rightPart);
 
-    this.addRawFace(newBoundary);
+    this.setRawFace(newFace, newBoundary);
     this.version++;
   }
 
