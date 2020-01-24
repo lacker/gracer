@@ -1,4 +1,5 @@
 import PlanarGraph from "./PlanarGraph";
+import { pairs } from "./Util";
 import Vector from "./Vector";
 
 export default class EmbeddedGraph {
@@ -46,6 +47,37 @@ export default class EmbeddedGraph {
     return this.graph.edges();
   }
 
+  // If the vertices are correctly clockwise, reports the area.
+  // If the vertices are all counterclockwise, reports negative area.
+  // It returns some arbitrary positive number for the outside face to
+  // indicate everything is okay out there.
+  // If it's self-intersecting then it depends.
+  // See https://www.mathopenref.com/coordpolygonarea.html for formula
+  signedArea(face: number): number {
+    if (face === 0) {
+      return 100;
+    }
+    let boundary = this.graph.getBoundary(face);
+    let sum = 0;
+    for (let [v1, v2] of pairs(boundary)) {
+      let pos1 = this.position(v1);
+      let pos2 = this.position(v2);
+      sum += pos1.y * pos2.x - pos1.x * pos2.y;
+    }
+    return sum / 2;
+  }
+
+  center(face: number): Vector {
+    let sum = Vector.zero();
+    let num = 0;
+    let boundary = this.graph.getBoundary(face);
+    for (let v of boundary) {
+      sum = sum.add(this.position(v));
+      num++;
+    }
+    return sum.scale(num);
+  }
+
   // Returns whether the elements have changed
   step(): boolean {
     let changed = false;
@@ -71,22 +103,21 @@ export default class EmbeddedGraph {
 
       // Start out with a small force towards the center of the graph, plus
       // a force away from the center of mass.
+      // This nudges the graph towards the center.
       let force = vpos.scaleTo(-0.001);
       let outwards = vpos.sub(center);
       force = force.add(outwards.scaleTo(0.005));
 
       for (let neighbor of this.graph.neighbors(vertex)) {
+        // Simulate a spring for each edge.
+        // Scale quadratically like a real spring
         let npos = this.position(neighbor);
-
-        // Figure out the target spot where we should be
         let diff = vpos.sub(npos);
         let idealDiff = diff.scaleTo(1);
         let target = npos.add(idealDiff);
-
-        // Scale quadratically like a real spring
         let delta = target.sub(vpos);
-        let partialForce = delta.scale(0.5 * delta.length());
-        force = force.add(partialForce);
+        let springForce = delta.scale(0.5 * delta.length());
+        force = force.add(springForce);
       }
 
       // Cap the force

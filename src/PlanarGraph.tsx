@@ -1,3 +1,5 @@
+import { pairs } from "./Util";
+
 type Edge = {
   left: number;
   right: number;
@@ -42,17 +44,6 @@ function intersect(list1: number[], list2: number[]): number[] {
     if (list2.includes(item)) {
       answer.push(item);
     }
-  }
-  return answer;
-}
-
-function pairs(list: number[]): number[][] {
-  let answer: number[][] = [];
-  for (let i = 1; i < list.length; i++) {
-    answer.push([list[i - 1], list[i]]);
-  }
-  if (list.length > 1) {
-    answer.push([list[list.length - 1], list[0]]);
   }
   return answer;
 }
@@ -159,6 +150,23 @@ export default class PlanarGraph {
     let blank = { left: -1, right: -1 };
     v1map.set(v2, blank);
     return blank;
+  }
+
+  // Returns all vertices that share an inner face with this vertex.
+  // This does not count the outer face.
+  cofacial(v: number): number[] {
+    let answer = new Set<number>();
+    for (let neighbor of this.neighbors(v)) {
+      answer.add(neighbor);
+      let edge = this.getEdge(v, neighbor);
+      let boundary = this.getBoundary(edge.right);
+      for (let vertex of boundary) {
+        if (vertex !== v) {
+          answer.add(vertex);
+        }
+      }
+    }
+    return Array.from(answer.values());
   }
 
   log() {
