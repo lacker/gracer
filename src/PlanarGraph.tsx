@@ -420,9 +420,6 @@ export default class PlanarGraph implements Graph {
     score += scoreForPseudodegree(d3 - 1) - scoreForPseudodegree(d3);
 
     let edge = this.getEdge(v1, v3);
-    if (edge.left !== face) {
-      throw new Error("logic error");
-    }
     if (edge.right === 0) {
       // v2 would gain 2 pseudodegree with this edge, because it would
       // now be on the outer face.
@@ -438,20 +435,22 @@ export default class PlanarGraph implements Graph {
   }
 
   randomlyMutate() {
-    if (Math.random() < 0.05) {
+    if (Math.random() < 0.1) {
       this.addRandomVertex();
       return;
     }
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 100; i++) {
       let [v1, v2] = this.randomEdge();
       let edge = this.getEdge(v1, v2);
       let face = edge.right;
       let v3 = this.nextVertex(face, v2);
 
       if (this.canRemoveEdge(v1, v3)) {
-        this.removeEdge(v1, v3);
-        return;
+        if (this.scoreToRemoveEdge(face, v1, v2, v3) > 0) {
+          this.removeEdge(v1, v3);
+          return;
+        }
       }
 
       if (this.hasEdge(v1, v3)) {
@@ -462,9 +461,11 @@ export default class PlanarGraph implements Graph {
         continue;
       }
 
-      console.log(`adding edge ${v1}-${v3}`);
-      this.addEdge(v1, v3, face);
-      return;
+      if (this.scoreToAddEdge(face, v1, v2, v3) > 0) {
+        console.log(`adding edge ${v1}-${v3}`);
+        this.addEdge(v1, v3, face);
+        return;
+      }
     }
 
     console.log("can't find an edge tweak");
