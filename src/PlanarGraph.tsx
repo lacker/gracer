@@ -403,6 +403,8 @@ export default class PlanarGraph implements Graph {
       // no longer be on the outer face.
       let d2 = this.pseudodegree(v2);
       score += scoreForPseudodegree(d2 - 2) - scoreForPseudodegree(d2);
+    } else if (this.getBoundary(face).length > 4) {
+      score += 1;
     }
     return score;
   }
@@ -425,6 +427,8 @@ export default class PlanarGraph implements Graph {
       // now be on the outer face.
       let d2 = this.pseudodegree(v2);
       score += scoreForPseudodegree(d2 + 2) - scoreForPseudodegree(d2);
+    } else if (this.getBoundary(edge.right).length >= 4) {
+      score -= 1;
     }
     return score;
   }
