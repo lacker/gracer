@@ -289,6 +289,10 @@ export default class PlanarGraph implements Graph {
     this.version++;
   }
 
+  degree(v: number): number {
+    return this.neighbors(v).length;
+  }
+
   randomFace(): number {
     let faces = Array.from(this.facemap.keys());
     return faces[Math.floor(Math.random() * faces.length)];
