@@ -343,7 +343,22 @@ export default class PlanarGraph implements Graph {
 
   randomEdge(): number[] {
     let all = this.edges();
-    return all[Math.floor(Math.random() * all.length)];
+    let [v1, v2] = all[Math.floor(Math.random() * all.length)];
+    if (Math.random() < 0.5) {
+      return [v1, v2];
+    } else {
+      return [v2, v1];
+    }
+  }
+
+  // Keeping the same face as v1->v2's right, return the next vertex
+  // along the boundary.
+  nextVertexUsingRightHandRule(v1: number, v2: number): number {
+    let edge = this.getEdge(v1, v2);
+    let boundary = this.getBoundary(edge.right);
+    let i2 = boundary.indexOf(v2);
+    let index = (i2 + 1) & boundary.length;
+    return boundary[index];
   }
 
   tryToRandomlySplitFace(face: number): boolean {
