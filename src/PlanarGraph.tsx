@@ -63,6 +63,7 @@ function pairs(list: number[]): number[][] {
 // The graph must be connected.
 // Each face must have at least three vertices, including the outer face.
 // Vertices on a face may not be repeated.
+// Two vertices may be connected by at most one edge.
 // The minimum PlanarGraph is thus a triangle.
 // A PlanarGraph with faces filled in is topologically a 2-sphere.
 export default class PlanarGraph implements Graph {
@@ -100,6 +101,30 @@ export default class PlanarGraph implements Graph {
     this.addRawFace([3, 2, 1]);
 
     this.version = 1;
+  }
+
+  check(): void {
+    for (let [v1, edgelist] of this.edgemap.entries()) {
+      for (let [v2, edge] of edgelist.entries()) {
+        if (edge.left < 0 || edge.right < 0) {
+          throw new Error(`bad edge: ${v1}-${v2} L${edge.left} R${edge.right}`);
+        }
+      }
+    }
+    for (let [face, boundary] of this.facemap.entries()) {
+      for (let [v1, v2] of pairs(boundary)) {
+        let right = this.getEdge(v1, v2).right;
+        if (right !== face) {
+          throw new Error(
+            `${v1}-${v2}.right should be ${face} but is ${right}`
+          );
+        }
+        let left = this.getEdge(v2, v1).left;
+        if (left !== face) {
+          throw new Error(`${v1}-${v2}.left should be ${face} but is ${left}`);
+        }
+      }
+    }
   }
 
   // Adds a vertex that isn't connected to anything
@@ -186,6 +211,7 @@ export default class PlanarGraph implements Graph {
 
   // Adds a new vertex on the edge between two vertices that are currently connected.
   addVertex(v1: number, v2: number): number {
+    console.log(`adding vertex in ${v1}-${v2}`);
     // Remove the old edge, tracking left and right.
     let v1map = this.edgemap.get(v1);
     let v2map = this.edgemap.get(v2);
@@ -228,6 +254,9 @@ export default class PlanarGraph implements Graph {
   // vertices.
   // The longer of the two keeps the existing face number.
   addEdge(v1: number, v2: number, face: number) {
+    if (this.hasEdge(v1, v2)) {
+      throw new Error(`cannot add edge ${v1}-${v2} that already exists`);
+    }
     let circle = this.getBoundary(face);
     let from1to2 = chopCircle(circle, v1, v2);
     let from2to1 = chopCircle(circle, v2, v1);
@@ -251,6 +280,10 @@ export default class PlanarGraph implements Graph {
     return answer;
   }
 
+  hasEdge(v1: number, v2: number): boolean {
+    return !!this.getVertexMap(v1).get(v2);
+  }
+
   // Fails if there is no such edge
   getEdge(v1: number, v2: number): Edge {
     let edge = this.getVertexMap(v1).get(v2);
@@ -264,7 +297,7 @@ export default class PlanarGraph implements Graph {
   getBoundary(face: number): number[] {
     let boundary = this.facemap.get(face);
     if (!boundary) {
-      throw new Error("no such face");
+      throw new Error(`cannot get boundary for nonexistent face: ${face}`);
     }
     return boundary;
   }
@@ -277,6 +310,7 @@ export default class PlanarGraph implements Graph {
   }
 
   removeEdge(v1: number, v2: number) {
+    console.log(`removing edge ${v1}-${v2}`);
     let edge = this.getEdge(v1, v2);
     let left = this.getBoundary(edge.left);
     let right = this.getBoundary(edge.right);
@@ -317,18 +351,30 @@ export default class PlanarGraph implements Graph {
     if (boundary.length < 4) {
       return false;
     }
-    if (face === 0) {
+    if (face === 0 && boundary.length < 6) {
       return false;
     }
     let index1 = Math.floor(boundary.length * Math.random());
     // Split into a triangle and one other part.
     let index2 = (index1 + 2) % boundary.length;
+    if (this.hasEdge(boundary[index1], boundary[index2])) {
+      return false;
+    }
+    console.log(`splitting face ${face}`);
     this.addEdge(boundary[index1], boundary[index2], face);
+    this.check();
     return true;
   }
 
   randomlyMutate() {
     let [v1, v2] = this.randomEdge();
+
+    if (Math.random() && this.canRemoveEdge(v1, v2)) {
+      this.removeEdge(v1, v2);
+      this.check();
+      return;
+    }
+
     let edge = this.getEdge(v1, v2);
     let faces: number[];
     if (Math.random() < 0.5) {
@@ -348,5 +394,6 @@ export default class PlanarGraph implements Graph {
     } else {
       this.addVertex(v1, v2);
     }
+    this.check();
   }
 }
