@@ -121,19 +121,12 @@ export default class EmbeddedGraph {
       let vpos = this.position(vertex);
       addForce(vertex, vpos.scaleTo(-0.001));
 
-      let outwards = vpos.sub(center).scaleTo(0.01);
+      let outwards = vpos.sub(center).scaleTo(0.005);
       addForce(vertex, outwards);
     }
 
     // Spring forces
     for (let [v1, v2] of this.graph.edgesBothWays()) {
-      // If both the faces are pointing the wrong way, it doesn't seem
-      // like we should operate the spring.
-      let edge = this.graph.getEdge(v1, v2);
-      if (invertedFaces.has(edge.left) && invertedFaces.has(edge.right)) {
-        continue;
-      }
-
       // Calculate a spring force on v2
       let pos1 = this.position(v1);
       let pos2 = this.position(v2);
@@ -142,6 +135,52 @@ export default class EmbeddedGraph {
       let linear = target.sub(pos2);
       let quadraticForce = linear.scale(0.5 * linear.length());
       addForce(v2, quadraticForce);
+    }
+
+    // Forces between edges and vertices of the same face
+    for (let face of this.graph.faces()) {
+      if (face === 0) {
+        continue;
+      }
+      let boundary = this.graph.getBoundary(face);
+      for (let [v1, v2] of pairs(boundary)) {
+        // Check if the v1-v2 edge should repulse v3
+        let pos1 = this.position(v1);
+        let pos2 = this.position(v2);
+        let diff = pos2.sub(pos1);
+        let lineMass = diff.length();
+        let unit = diff.scaleTo(1);
+        // Since the face is on the right, the direction of repulsion
+        // is to the right of the edge.
+        let direction = unit.rotate(-Math.PI / 2);
+
+        let base1 = direction.dot(pos1);
+        let base2 = direction.dot(pos2);
+
+        if (Math.abs(base1 - base2) > 0.01) {
+          throw new Error("bad vector math");
+        }
+
+        for (let v3 of boundary) {
+          if (v3 === v1 || v3 === v2) {
+            continue;
+          }
+
+          let pos3 = this.position(v3);
+          let current = direction.dot(pos3) - base1;
+          let target = 0.25;
+          if (current > target) {
+            // This is fine
+            continue;
+          }
+
+          let miss = target - current;
+          let force = direction.scale(0.5 * lineMass * miss * miss);
+          addForce(v3, force);
+          addForce(v1, force.scale(-0.5));
+          addForce(v2, force.scale(-0.5));
+        }
+      }
     }
 
     // Update positions

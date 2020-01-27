@@ -14,7 +14,10 @@ export default function App() {
     <Canvas
       onClick={() => {
         graph.randomlyMutate();
-        // graph.log();
+      }}
+      onContextMenu={e => {
+        e.preventDefault();
+        graph.randomlyMutate();
       }}
       resize={{ scroll: false }}
       orthographic

@@ -54,8 +54,8 @@ export default class Vector {
   // Rotates anticlockwise.
   rotate(radians: number): Vector {
     return new Vector(
-      Math.cos(radians * this.x) + Math.sin(radians * this.y),
-      Math.sin(radians * this.x) + Math.cos(radians * this.y)
+      Math.cos(radians) * this.x - Math.sin(radians) * this.y,
+      Math.sin(radians) * this.x + Math.cos(radians) * this.y
     );
   }
 }
