@@ -390,7 +390,7 @@ export default class PlanarGraph {
     return answer;
   }
 
-  // Keeping the same face as v1->v2's right, return the next vertex
+  // Keeping the same face as v's right, return the next vertex
   nextVertex(face: number, v: number): number {
     let boundary = this.getBoundary(face);
     let index = boundary.indexOf(v);
