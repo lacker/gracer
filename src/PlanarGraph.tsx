@@ -466,12 +466,7 @@ export default class PlanarGraph {
     this.addVertex(v1, v2);
   }
 
-  randomlyMutate() {
-    if (Math.random() < 0.05) {
-      this.addRandomVertex();
-      return;
-    }
-
+  mutateEdge(): boolean {
     let edges = this.shuffleEdges();
     for (let [v1, v2] of edges) {
       let edge = this.getEdge(v1, v2);
@@ -481,7 +476,7 @@ export default class PlanarGraph {
       if (this.canRemoveEdge(v1, v3)) {
         if (this.scoreToRemoveEdge(face, v1, v2, v3) >= 0) {
           this.removeEdge(v1, v3);
-          return;
+          return true;
         }
       }
 
@@ -496,11 +491,15 @@ export default class PlanarGraph {
       if (this.scoreToAddEdge(face, v1, v2, v3) >= 0) {
         console.log(`adding edge ${v1}-${v3}`);
         this.addEdge(v1, v3, face);
-        return;
+        return true;
       }
     }
+    return false;
+  }
 
-    console.log("can't find an edge tweak");
-    this.addRandomVertex();
+  randomlyMutate() {
+    if (Math.random() < 0.05 || !this.mutateEdge()) {
+      this.addRandomVertex();
+    }
   }
 }
