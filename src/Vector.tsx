@@ -7,6 +7,10 @@ export default class Vector {
     this.y = y;
   }
 
+  toString(): string {
+    return `(x=${this.x}, y=${this.y})`;
+  }
+
   static zero(): Vector {
     return new Vector(0, 0);
   }

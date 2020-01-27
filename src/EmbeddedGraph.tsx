@@ -86,8 +86,13 @@ export default class EmbeddedGraph {
       changed = true;
     }
 
-    // Update positions in a batch at the end
-    let newPositions = new Map<number, Vector>();
+    // Figure out which faces are inverted
+    let invertedFaces = new Set<number>();
+    for (let face of this.graph.faces()) {
+      if (this.signedArea(face) < 0) {
+        invertedFaces.add(face);
+      }
+    }
 
     // Calculate center of mass
     let sum = Vector.zero();
@@ -98,28 +103,49 @@ export default class EmbeddedGraph {
     }
     let center = sum.scale(1 / num);
 
+    // We use a model of different forces to produce an embedding of
+    // the graph that looks continuous, while also permitting change
+    // over time.
+    // Forcemap tracks the total force on each vertex as we sum up the
+    // different forces acting on it.
+    let forcemap = new Map<number, Vector>();
+    let addForce = (v: number, force: Vector) => {
+      let old = forcemap.get(v) || Vector.zero();
+      forcemap.set(v, old.add(force));
+    };
+
+    // Start out with a small force towards the center of the graph, plus
+    // a force away from the center of mass.
+    // This nudges the graph towards the center without smushing it.
     for (let vertex of this.vertices()) {
       let vpos = this.position(vertex);
+      addForce(vertex, vpos.scaleTo(-0.001));
 
-      // Start out with a small force towards the center of the graph, plus
-      // a force away from the center of mass.
-      // This nudges the graph towards the center.
-      let force = vpos.scaleTo(-0.001);
-      let outwards = vpos.sub(center);
-      force = force.add(outwards.scaleTo(0.005));
+      let outwards = vpos.sub(center).scaleTo(0.01);
+      addForce(vertex, outwards);
+    }
 
-      for (let neighbor of this.graph.neighbors(vertex)) {
-        // Simulate a spring for each edge.
-        // Scale quadratically like a real spring
-        let npos = this.position(neighbor);
-        let diff = vpos.sub(npos);
-        let idealDiff = diff.scaleTo(1);
-        let target = npos.add(idealDiff);
-        let delta = target.sub(vpos);
-        let springForce = delta.scale(0.5 * delta.length());
-        force = force.add(springForce);
+    // Spring forces
+    for (let [v1, v2] of this.graph.edgesBothWays()) {
+      // If both the faces are pointing the wrong way, it doesn't seem
+      // like we should operate the spring.
+      let edge = this.graph.getEdge(v1, v2);
+      if (invertedFaces.has(edge.left) && invertedFaces.has(edge.right)) {
+        continue;
       }
 
+      // Calculate a spring force on v2
+      let pos1 = this.position(v1);
+      let pos2 = this.position(v2);
+      let diff = pos2.sub(pos1);
+      let target = pos1.add(diff.scaleTo(1));
+      let linear = target.sub(pos2);
+      let quadraticForce = linear.scale(0.5 * linear.length());
+      addForce(v2, quadraticForce);
+    }
+
+    // Update positions
+    for (let [vertex, force] of forcemap.entries()) {
       // Cap the force
       let cap = 0.5;
       if (force.length() > cap) {
@@ -128,12 +154,7 @@ export default class EmbeddedGraph {
       if (force.length() < 0.001) {
         continue;
       }
-      newPositions.set(vertex, vpos.add(force));
-    }
-
-    // Apply the position updates
-    for (let [v, pos] of newPositions) {
-      this.positions.set(v, pos);
+      this.positions.set(vertex, this.position(vertex).add(force));
     }
 
     return changed;

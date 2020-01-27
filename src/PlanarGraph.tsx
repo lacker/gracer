@@ -209,16 +209,18 @@ export default class PlanarGraph {
     return Array.from(this.edgemap.keys());
   }
 
-  edges(): number[][] {
+  edgesBothWays(): number[][] {
     let answer = [];
     for (let [v1, v1map] of this.edgemap) {
       for (let v2 of v1map.keys()) {
-        if (v1 < v2) {
-          answer.push([v1, v2]);
-        }
+        answer.push([v1, v2]);
       }
     }
     return answer;
+  }
+
+  edges(): number[][] {
+    return this.edgesBothWays().filter(e => e[0] < e[1]);
   }
 
   neighbors(v: number): number[] {
@@ -359,8 +361,12 @@ export default class PlanarGraph {
     return this.neighbors(v).length;
   }
 
+  faces(): number[] {
+    return Array.from(this.facemap.keys());
+  }
+
   randomFace(): number {
-    let faces = Array.from(this.facemap.keys());
+    let faces = this.faces();
     return faces[Math.floor(Math.random() * faces.length)];
   }
 
@@ -390,7 +396,7 @@ export default class PlanarGraph {
     return answer;
   }
 
-  // Keeping the same face as v's right, return the next vertex
+  // Return the next vertex along the given face
   nextVertex(face: number, v: number): number {
     let boundary = this.getBoundary(face);
     let index = boundary.indexOf(v);
