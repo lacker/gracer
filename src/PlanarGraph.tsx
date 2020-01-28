@@ -544,6 +544,17 @@ export default class PlanarGraph {
     return true;
   }
 
+  // Returns whether we managed to rotate an edge.
+  randomlyRotateEdge(): boolean {
+    let edges = this.shuffleEdges();
+    for (let [v1, v2] of edges) {
+      if (this.maybeRotateEdge(v1, v2)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   addRandomVertex() {
     let [v1, v2] = this.randomEdge();
     this.addVertex(v1, v2);
