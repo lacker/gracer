@@ -186,7 +186,7 @@ export default class EmbeddedGraph {
     // Update positions
     for (let [vertex, force] of forcemap.entries()) {
       // Cap the force
-      let cap = 0.5;
+      let cap = 0.1;
       if (force.length() > cap) {
         force = force.scaleTo(cap);
       }

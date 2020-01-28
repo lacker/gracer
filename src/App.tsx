@@ -10,7 +10,7 @@ export default function App() {
   let graph = new PlanarGraph();
   let embedded = new EmbeddedGraph(graph);
 
-  setInterval(() => graph.randomlyMutate(), 1000);
+  setInterval(() => graph.randomlyMutate(), 300);
 
   return (
     <Canvas

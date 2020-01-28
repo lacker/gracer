@@ -416,6 +416,13 @@ export default class PlanarGraph {
     return answer;
   }
 
+  // The change in score that comes from changing the pseudodegree
+  // of this vertex by the given amount.
+  deltaScore(vertex: number, delta: number): number {
+    let degree = this.pseudodegree(vertex);
+    return scoreForPseudodegree(degree + delta) - scoreForPseudodegree(degree);
+  }
+
   // Whether a new v1-v3 edge would be good according to curvature.
   // The higher the score, the better it is to add an edge.
   // Zero means we are indifferent.
