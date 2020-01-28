@@ -109,7 +109,7 @@ export default class PlanarGraph {
   check(): void {
     for (let [v1, edgelist] of this.edgemap.entries()) {
       for (let [v2, edge] of edgelist.entries()) {
-        if (edge.left < 0 || edge.right < 0) {
+        if (!this.facemap.has(edge.left) || !this.facemap.has(edge.right)) {
           throw new Error(`bad edge: ${v1}-${v2} L${edge.left} R${edge.right}`);
         }
       }
@@ -270,6 +270,59 @@ export default class PlanarGraph {
 
     this.version++;
     return newV;
+  }
+
+  // Put a vertex in the middle of a face
+  stellate(face: number) {
+    if (face === 0) {
+      throw new Error("cannot stellate the outer face");
+    }
+    let boundary = this.getBoundary(face);
+    let v = this.addRawVertex();
+    this.facemap.delete(face);
+    for (let [a, b] of pairs(boundary)) {
+      this.addRawFace([a, b, v]);
+    }
+    this.version++;
+  }
+
+  randomlyStellate() {
+    // Find a non-outer face
+    let edges = this.shuffleEdges();
+    for (let [v1, v2] of edges) {
+      let face = this.getEdge(v1, v2).right;
+      if (face === 0) {
+        continue;
+      }
+      this.stellate(face);
+      return;
+    }
+    throw new Error("could not find a face to stellate");
+  }
+
+  // v1-v2's right must be the outer edge
+  addOuterTriangle(v1: number, v2: number) {
+    let edge = this.getEdge(v1, v2);
+    if (edge.right !== 0) {
+      throw new Error("addOuterTriangle must be called on outer edges");
+    }
+    let boundary = this.getBoundary(0);
+    let chopped = chopCircle(boundary, v2, v1);
+    if (chopped.length !== boundary.length) {
+      throw new Error("nonadjacent vertices in addOuterTriangle");
+    }
+    let vertex = this.addRawVertex();
+    chopped.push(vertex);
+    this.addRawFace([v1, v2, vertex]);
+    this.setRawFace(0, chopped);
+    this.version++;
+  }
+
+  randomlyAddOuterTriangle() {
+    let boundary = this.getBoundary(0);
+    let edges = pairs(boundary);
+    let [v1, v2] = edges[Math.floor(Math.random() * edges.length)];
+    this.addOuterTriangle(v1, v2);
   }
 
   // Adds an edge to split the given face, between the given two
@@ -529,7 +582,7 @@ export default class PlanarGraph {
 
   randomlyMutate() {
     if (Math.random() < 0.05 || !this.mutateEdge()) {
-      this.addRandomVertex();
+      this.randomlyStellate();
     }
   }
 }

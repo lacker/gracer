@@ -10,16 +10,16 @@ export default function App() {
   let graph = new PlanarGraph();
   let embedded = new EmbeddedGraph(graph);
 
-  setInterval(() => graph.randomlyMutate(), 300);
+  setInterval(() => graph.randomlyMutate(), 1000);
 
   return (
     <Canvas
       onClick={() => {
-        graph.mutateEdge() || graph.addRandomVertex();
+        graph.mutateEdge() || graph.randomlyAddOuterTriangle();
       }}
       onContextMenu={e => {
         e.preventDefault();
-        graph.addRandomVertex();
+        graph.randomlyAddOuterTriangle();
       }}
       resize={{ scroll: false }}
       orthographic
