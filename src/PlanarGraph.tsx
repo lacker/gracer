@@ -460,6 +460,37 @@ export default class PlanarGraph {
     return score;
   }
 
+  // Returns true if we rotated the edge.
+  maybeRotateEdge(v1: number, v2: number): boolean {
+    let edge = this.getEdge(v1, v2);
+    if (edge.left === 0 || edge.right === 0) {
+      return false;
+    }
+    if (!this.canRemoveEdge(v1, v2)) {
+      return false;
+    }
+    let v3 = this.nextVertex(edge.left, v2);
+    if (this.nextVertex(edge.left, v3) !== v1) {
+      throw new Error("expected triangle");
+    }
+    let v4 = this.nextVertex(edge.right, v2);
+    if (this.nextVertex(edge.right, v4) !== v1) {
+      throw new Error("expected triangle");
+    }
+    let score =
+      this.deltaScore(v1, -1) +
+      this.deltaScore(v2, -1) +
+      this.deltaScore(v3, 1) +
+      this.deltaScore(v4, 1);
+    if (score < 0) {
+      return false;
+    }
+    this.removeEdge(v1, v2);
+    let face = this.getEdge(v2, v3).left;
+    this.addEdge(v3, v4, face);
+    return true;
+  }
+
   addRandomVertex() {
     let [v1, v2] = this.randomEdge();
     this.addVertex(v1, v2);
