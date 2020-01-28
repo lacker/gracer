@@ -428,17 +428,14 @@ export default class PlanarGraph {
   // Zero means we are indifferent.
   // v1-v2-v3 should be a path where face is on their right.
   scoreToAddEdge(face: number, v1: number, v2: number, v3: number): number {
-    let score = 0;
-    let d1 = this.pseudodegree(v1);
-    score += scoreForPseudodegree(d1 + 1) - scoreForPseudodegree(d1);
-    let d3 = this.pseudodegree(v3);
-    score += scoreForPseudodegree(d3 + 1) - scoreForPseudodegree(d3);
+    let score = this.deltaScore(v1, 1) + this.deltaScore(v3, 1);
     if (face === 0) {
       // v2 would lose 2 pseudodegree with this edge, because it would
       // no longer be on the outer face.
       let d2 = this.pseudodegree(v2);
       score += scoreForPseudodegree(d2 - 2) - scoreForPseudodegree(d2);
     } else if (this.getBoundary(face).length > 5) {
+      // Avoid pexagons
       score += 1;
     }
     return score;
@@ -463,6 +460,7 @@ export default class PlanarGraph {
       let d2 = this.pseudodegree(v2);
       score += scoreForPseudodegree(d2 + 2) - scoreForPseudodegree(d2);
     } else if (this.getBoundary(edge.right).length >= 5) {
+      // Avoid pexagons
       score -= 1;
     }
     return score;
