@@ -388,7 +388,6 @@ export default class PlanarGraph {
   }
 
   removeEdge(v1: number, v2: number) {
-    console.log(`removing edge ${v1}-${v2}`);
     let edge = this.getEdge(v1, v2);
     let left = this.getBoundary(edge.left);
     let right = this.getBoundary(edge.right);
@@ -522,13 +521,16 @@ export default class PlanarGraph {
     if (!this.canRemoveEdge(v1, v2)) {
       return false;
     }
-    let v3 = this.nextVertex(edge.left, v2);
-    if (this.nextVertex(edge.left, v3) !== v1) {
+    let v3 = this.nextVertex(edge.left, v1);
+    if (this.nextVertex(edge.left, v3) !== v2) {
       throw new Error("expected triangle");
     }
     let v4 = this.nextVertex(edge.right, v2);
     if (this.nextVertex(edge.right, v4) !== v1) {
       throw new Error("expected triangle");
+    }
+    if (this.hasEdge(v3, v4)) {
+      return false;
     }
     let score =
       this.deltaScore(v1, -1) +
@@ -541,6 +543,7 @@ export default class PlanarGraph {
     this.removeEdge(v1, v2);
     let face = this.getEdge(v2, v3).left;
     this.addEdge(v3, v4, face);
+    console.log(`replacing ${v1}-${v2} with ${v3}-${v4}`);
     return true;
   }
 
@@ -560,40 +563,17 @@ export default class PlanarGraph {
     this.addVertex(v1, v2);
   }
 
-  mutateEdge(): boolean {
-    let edges = this.shuffleEdges();
-    for (let [v1, v2] of edges) {
-      let edge = this.getEdge(v1, v2);
-      let face = edge.right;
-      let v3 = this.nextVertex(face, v2);
-
-      if (this.canRemoveEdge(v1, v3)) {
-        if (this.scoreToRemoveEdge(face, v1, v2, v3) >= 0) {
-          this.removeEdge(v1, v3);
-          return true;
-        }
-      }
-
-      if (this.hasEdge(v1, v3)) {
-        continue;
-      }
-
-      if (face === 0 && this.degree(v2) < 5) {
-        continue;
-      }
-
-      if (this.scoreToAddEdge(face, v1, v2, v3) >= 0) {
-        console.log(`adding edge ${v1}-${v3}`);
-        this.addEdge(v1, v3, face);
-        return true;
-      }
+  tick() {
+    if (Math.random() < 0.05 || !this.randomlyRotateEdge()) {
+      this.randomlyAddOuterTriangle();
     }
-    return false;
   }
 
-  randomlyMutate() {
-    if (Math.random() < 0.05 || !this.mutateEdge()) {
-      this.randomlyStellate();
-    }
+  leftClick() {
+    this.randomlyRotateEdge();
+  }
+
+  rightClick() {
+    this.randomlyStellate();
   }
 }
