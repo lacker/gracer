@@ -475,43 +475,6 @@ export default class PlanarGraph {
     return scoreForPseudodegree(degree + delta) - scoreForPseudodegree(degree);
   }
 
-  // Whether a new v1-v3 edge would be good according to curvature.
-  // The higher the score, the better it is to add an edge.
-  // Zero means we are indifferent.
-  // v1-v2-v3 should be a path where face is on their right.
-  scoreToAddEdge(face: number, v1: number, v2: number, v3: number): number {
-    let score = this.deltaScore(v1, 1) + this.deltaScore(v3, 1);
-    if (face === 0) {
-      // v2 would lose 2 pseudodegree with this edge, because it would
-      // no longer be on the outer face.
-      score += this.deltaScore(v2, -2);
-    } else if (this.getBoundary(face).length > 5) {
-      // Avoid pexagons
-      score += 1;
-    }
-    return score;
-  }
-
-  // Whether removing the v1-v3 edge would be good according to
-  // curvature.
-  // The higher the score, the better it is to remove the edge.
-  // Zero means we are indifferent.
-  // v1-v2-v3 should be a path where face is on their right.
-  scoreToRemoveEdge(face: number, v1: number, v2: number, v3: number): number {
-    let score = this.deltaScore(v1, -1) + this.deltaScore(v3, -1);
-
-    let edge = this.getEdge(v1, v3);
-    if (edge.right === 0) {
-      // v2 would gain 2 pseudodegree with this edge, because it would
-      // now be on the outer face.
-      score += this.deltaScore(v2, 2);
-    } else if (this.getBoundary(edge.right).length >= 5) {
-      // Avoid pexagons
-      score -= 1;
-    }
-    return score;
-  }
-
   // Returns true if we rotated the edge.
   maybeRotateEdge(v1: number, v2: number): boolean {
     let edge = this.getEdge(v1, v2);
