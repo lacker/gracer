@@ -9,7 +9,6 @@ import PlanarGraph from "./PlanarGraph";
 function GraphViewWrapper(props: { graph: EmbeddedGraph }) {
   let [steps, setSteps] = useState(0);
   setTimeout(() => {
-    // More ticks make the problem appear faster
     props.graph.graph.tick();
     props.graph.graph.tick();
     props.graph.graph.tick();
