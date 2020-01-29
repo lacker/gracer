@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useFrame } from "react-three-fiber";
 import * as THREE from "three";
 
@@ -63,13 +63,10 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
   );
 }
 
-export default function GraphView(props: { graph: EmbeddedGraph }) {
-  let [ticks, setTicks] = useState(0);
-  useFrame(() => {
-    if (props.graph.step()) {
-      setTicks(ticks + 1);
-    }
-  });
+export default function GraphView(props: {
+  graph: EmbeddedGraph;
+  steps: number;
+}) {
   return (
     <>
       {props.graph.vertices().map(v => (

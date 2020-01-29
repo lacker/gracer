@@ -506,7 +506,7 @@ export default class PlanarGraph {
     this.removeEdge(v1, v2);
     let face = this.getEdge(v2, v3).left;
     this.addEdge(v3, v4, face);
-    console.log(`replacing ${v1}-${v2} with ${v3}-${v4}`);
+    // console.log(`replacing ${v1}-${v2} with ${v3}-${v4}`);
     return true;
   }
 

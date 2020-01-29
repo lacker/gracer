@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Canvas } from "react-three-fiber";
 import "./App.css";
 
@@ -6,11 +6,26 @@ import EmbeddedGraph from "./EmbeddedGraph";
 import GraphView from "./GraphView";
 import PlanarGraph from "./PlanarGraph";
 
+function GraphViewWrapper(props: { graph: EmbeddedGraph }) {
+  let [steps, setSteps] = useState(0);
+  setTimeout(() => {
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.graph.tick();
+    props.graph.step();
+    setSteps(steps + 1);
+  }, 100);
+  return <GraphView graph={props.graph} steps={steps} />;
+}
+
 export default function App() {
   let graph = new PlanarGraph();
   let embedded = new EmbeddedGraph(graph);
-
-  setInterval(() => graph.tick(), 1000);
 
   return (
     <Canvas
@@ -28,7 +43,7 @@ export default function App() {
     >
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
-      <GraphView graph={embedded} />
+      <GraphViewWrapper graph={embedded} />
     </Canvas>
   );
 }
