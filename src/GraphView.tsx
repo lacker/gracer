@@ -34,28 +34,31 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     let dy = v2.y - v1.y;
     let dist = Math.sqrt(dx * dx + dy * dy);
     let angle = Math.atan2(dy, dx);
-    let geometry = new THREE.BoxGeometry(dist, 0.1, 0.1);
-    return { x, y, angle, geometry };
+    return { x, y, angle, dist };
   };
-  let { x, y, angle, geometry } = calculate();
+
   let mesh = useRef<any>();
   useFrame(() => {
     if (!mesh.current) {
       return;
     }
-    let { x, y, angle, geometry } = calculate();
+    let { x, y, angle, dist } = calculate();
     mesh.current.position.x = x;
     mesh.current.position.y = y;
-    mesh.current.geometry.dispose();
-    mesh.current.geometry = geometry;
+    mesh.current.scale.x = dist;
     mesh.current.rotation.z = angle;
   });
+
+  let { x, y, angle, dist } = calculate();
+  let geometry = new THREE.BoxGeometry(1, 0.1, 0.1);
+
   return (
     <mesh
       ref={mesh}
       visible
       position={[x, y, 0]}
       rotation={[0, 0, angle]}
+      scale={[dist, 1, 1]}
       geometry={geometry}
     >
       <meshLambertMaterial color="#777777" attach="material" />
@@ -63,10 +66,11 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
   );
 }
 
-export default function GraphView(props: {
-  graph: EmbeddedGraph;
-  steps: number;
-}) {
+function LiveGraphView(props: { graph: EmbeddedGraph; forceUpdate: number }) {
+  useFrame(() => {
+    props.graph.step();
+  });
+
   return (
     <>
       {props.graph.vertices().map(v => (
@@ -78,4 +82,23 @@ export default function GraphView(props: {
       ))}
     </>
   );
+}
+
+export default class GraphView extends React.Component<
+  { graph: EmbeddedGraph },
+  {}
+> {
+  constructor(props: { graph: EmbeddedGraph }) {
+    super(props);
+
+    props.graph.graph.addUpdateListener(() => {
+      this.forceUpdate();
+    });
+  }
+
+  render() {
+    return (
+      <LiveGraphView graph={this.props.graph} forceUpdate={Math.random()} />
+    );
+  }
 }

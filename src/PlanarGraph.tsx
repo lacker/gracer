@@ -83,7 +83,7 @@ export default class PlanarGraph {
   facemap: Map<number, number[]>;
   nextf: number;
 
-  version: number;
+  updateListeners: (() => void)[];
 
   // Creates a triangle with vertices:
   //
@@ -103,7 +103,7 @@ export default class PlanarGraph {
     this.addRawFace([1, 2, 3]);
     this.addRawFace([3, 2, 1]);
 
-    this.version = 1;
+    this.updateListeners = [];
   }
 
   check(): void {
@@ -268,7 +268,7 @@ export default class PlanarGraph {
     insertAfter(newLeftBoundary, newV, v2);
     this.setRawFace(left, newLeftBoundary);
 
-    this.version++;
+    this.announceUpdate();
     return newV;
   }
 
@@ -283,7 +283,7 @@ export default class PlanarGraph {
     for (let [a, b] of pairs(boundary)) {
       this.addRawFace([a, b, v]);
     }
-    this.version++;
+    this.announceUpdate();
   }
 
   randomlyStellate() {
@@ -315,7 +315,7 @@ export default class PlanarGraph {
     chopped.push(vertex);
     this.addRawFace([v1, v2, vertex]);
     this.setRawFace(0, chopped);
-    this.version++;
+    this.announceUpdate();
   }
 
   randomlyAddOuterTriangle() {
@@ -343,7 +343,7 @@ export default class PlanarGraph {
     }
     this.addRawFace(shorter);
     this.setRawFace(face, longer);
-    this.version++;
+    this.announceUpdate();
   }
 
   // Fails if there is no such vertex
@@ -406,7 +406,7 @@ export default class PlanarGraph {
     let newBoundary = leftPart.concat(rightPart);
 
     this.setRawFace(newFace, newBoundary);
-    this.version++;
+    this.announceUpdate();
   }
 
   degree(v: number): number {
@@ -538,5 +538,19 @@ export default class PlanarGraph {
 
   rightClick() {
     this.randomlyStellate();
+  }
+
+  announceUpdate() {
+    for (let listener of this.updateListeners) {
+      listener();
+    }
+  }
+
+  addUpdateListener(listener: () => void) {
+    this.updateListeners.push(listener);
+  }
+
+  removeUpdateListener(listener: () => void) {
+    this.updateListeners = this.updateListeners.filter(x => x !== listener);
   }
 }

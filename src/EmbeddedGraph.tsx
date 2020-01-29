@@ -5,12 +5,10 @@ import Vector from "./Vector";
 export default class EmbeddedGraph {
   graph: PlanarGraph;
   positions: Map<number, Vector>;
-  version: number;
 
   constructor(graph: PlanarGraph) {
     this.graph = graph;
     this.positions = new Map();
-    this.version = this.graph.version;
   }
 
   position(v: number): Vector {
@@ -78,14 +76,7 @@ export default class EmbeddedGraph {
     return sum.scale(num);
   }
 
-  // Returns whether the elements have changed
-  step(): boolean {
-    let changed = false;
-    if (this.version !== this.graph.version) {
-      this.version = this.graph.version;
-      changed = true;
-    }
-
+  step() {
     // Figure out which faces are inverted
     let invertedFaces = new Set<number>();
     for (let face of this.graph.faces()) {
@@ -195,7 +186,5 @@ export default class EmbeddedGraph {
       }
       this.positions.set(vertex, this.position(vertex).add(force));
     }
-
-    return changed;
   }
 }
