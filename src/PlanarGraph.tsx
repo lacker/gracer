@@ -526,7 +526,7 @@ export default class PlanarGraph {
     this.addVertex(v1, v2);
   }
 
-  tick() {
+  mutate() {
     if (Math.random() < 0.05 || !this.randomlyRotateEdge()) {
       this.randomlyAddOuterTriangle();
     }

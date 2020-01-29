@@ -68,7 +68,7 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
 
 function LiveGraphView(props: { graph: EmbeddedGraph; forceUpdate: number }) {
   useFrame(() => {
-    props.graph.step();
+    props.graph.tick();
   });
 
   return (

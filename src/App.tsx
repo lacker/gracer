@@ -11,7 +11,7 @@ export default function App() {
   let embedded = new EmbeddedGraph(graph);
 
   setInterval(() => {
-    graph.tick();
+    graph.mutate();
   }, 100);
 
   return (

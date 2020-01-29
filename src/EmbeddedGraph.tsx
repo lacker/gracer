@@ -76,7 +76,7 @@ export default class EmbeddedGraph {
     return sum.scale(num);
   }
 
-  step() {
+  tick() {
     // Figure out which faces are inverted
     let invertedFaces = new Set<number>();
     for (let face of this.graph.faces()) {
