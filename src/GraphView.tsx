@@ -15,10 +15,11 @@ function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
     mesh.current.position.x = v.x;
     mesh.current.position.y = v.y;
   });
+  let color = props.vertex === 1 ? "#000000" : "#0000ff";
   return (
     <mesh ref={mesh} visible position={[v.x, v.y, 0]} rotation={[0, 0, 0]}>
       <sphereGeometry attach="geometry" args={[0.2, 8, 8]} />
-      <meshLambertMaterial color="#0000ff" attach="material" />
+      <meshLambertMaterial color={color} attach="material" />
     </mesh>
   );
 }

@@ -108,6 +108,7 @@ export default class EmbeddedGraph {
     // Start out with a small force towards the center of the graph, plus
     // a force away from the center of mass.
     // This nudges the graph towards the center without smushing it.
+    // For vertex 1, make the force towards the center strong.
     for (let vertex of this.vertices()) {
       let vpos = this.position(vertex);
       addForce(vertex, vpos.scaleTo(-0.001));
@@ -184,7 +185,11 @@ export default class EmbeddedGraph {
       if (force.length() < 0.001) {
         continue;
       }
-      this.positions.set(vertex, this.position(vertex).add(force));
+      if (vertex === 1) {
+        this.positions.set(vertex, Vector.zero());
+      } else {
+        this.positions.set(vertex, this.position(vertex).add(force));
+      }
     }
   }
 }
