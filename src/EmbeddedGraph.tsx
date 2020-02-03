@@ -105,18 +105,6 @@ export default class EmbeddedGraph {
       forcemap.set(v, old.add(force));
     };
 
-    // Start out with a small force towards the center of the graph, plus
-    // a force away from the center of mass.
-    // This nudges the graph towards the center without smushing it.
-    // For vertex 1, make the force towards the center strong.
-    for (let vertex of this.vertices()) {
-      let vpos = this.position(vertex);
-      addForce(vertex, vpos.scaleTo(-0.001));
-
-      let outwards = vpos.sub(center).scaleTo(0.005);
-      addForce(vertex, outwards);
-    }
-
     // Spring forces
     for (let [v1, v2] of this.graph.edgesBothWays()) {
       // Calculate a spring force on v2
