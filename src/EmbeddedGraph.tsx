@@ -173,10 +173,14 @@ export default class EmbeddedGraph {
       if (force.length() < 0.001) {
         continue;
       }
-      if (vertex === 1) {
-        this.positions.set(vertex, Vector.zero());
-      } else {
-        this.positions.set(vertex, this.position(vertex).add(force));
+      this.positions.set(vertex, this.position(vertex).add(force));
+    }
+
+    if (this.positions.has(1)) {
+      // Keep vertex 1 in the center
+      let shift = this.position(1).scale(-1);
+      for (let [vertex, position] of this.positions.entries()) {
+        this.positions.set(vertex, position.add(shift));
       }
     }
   }
