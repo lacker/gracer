@@ -1,14 +1,16 @@
 export default class Vector {
   x: number;
   y: number;
+  z: number;
 
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+    this.z = 0;
   }
 
   toString(): string {
-    return `(x=${this.x}, y=${this.y})`;
+    return `(x=${this.x}, y=${this.y} z=${this.z})`;
   }
 
   static zero(): Vector {
@@ -32,7 +34,7 @@ export default class Vector {
   }
 
   dot(other: Vector): number {
-    return this.x * other.x + this.y * other.y;
+    return this.x * other.x + this.y * other.y + this.z * other.z;
   }
 
   sub(other: Vector): Vector {

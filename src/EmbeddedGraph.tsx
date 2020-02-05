@@ -85,15 +85,6 @@ export default class EmbeddedGraph {
       }
     }
 
-    // Calculate center of mass
-    let sum = Vector.zero();
-    let num = 0;
-    for (let v of this.vertices()) {
-      sum = sum.add(this.position(v));
-      num++;
-    }
-    let center = sum.scale(1 / num);
-
     // We use a model of different forces to produce an embedding of
     // the graph that looks continuous, while also permitting change
     // over time.
