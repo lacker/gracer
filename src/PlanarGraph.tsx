@@ -84,6 +84,7 @@ export default class PlanarGraph {
   nextf: number;
 
   updateListeners: (() => void)[];
+  paused: boolean;
 
   // Creates a triangle with vertices:
   //
@@ -104,6 +105,7 @@ export default class PlanarGraph {
     this.addRawFace([3, 2, 1]);
 
     this.updateListeners = [];
+    this.paused = false;
   }
 
   check(): void {
@@ -526,18 +528,25 @@ export default class PlanarGraph {
     this.addVertex(v1, v2);
   }
 
+  togglePause() {
+    this.paused = !this.paused;
+  }
+
   mutate() {
+    if (this.paused) {
+      return;
+    }
     if (Math.random() < 0.05 || !this.randomlyRotateEdge()) {
       this.randomlyAddOuterTriangle();
     }
   }
 
   leftClick() {
-    this.randomlyRotateEdge();
+    this.randomlyStellate();
   }
 
   rightClick() {
-    this.randomlyStellate();
+    this.togglePause();
   }
 
   announceUpdate() {
