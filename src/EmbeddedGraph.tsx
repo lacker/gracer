@@ -45,26 +45,6 @@ export default class EmbeddedGraph {
     return this.graph.edges();
   }
 
-  // If the vertices are correctly clockwise, reports the area.
-  // If the vertices are all counterclockwise, reports negative area.
-  // It returns some arbitrary positive number for the outside face to
-  // indicate everything is okay out there.
-  // If it's self-intersecting then it depends.
-  // See https://www.mathopenref.com/coordpolygonarea.html for formula
-  signedArea(face: number): number {
-    if (face === 0) {
-      return 100;
-    }
-    let boundary = this.graph.getBoundary(face);
-    let sum = 0;
-    for (let [v1, v2] of pairs(boundary)) {
-      let pos1 = this.position(v1);
-      let pos2 = this.position(v2);
-      sum += pos1.y * pos2.x - pos1.x * pos2.y;
-    }
-    return sum / 2;
-  }
-
   center(face: number): Vector {
     let sum = Vector.zero();
     let num = 0;
@@ -77,14 +57,6 @@ export default class EmbeddedGraph {
   }
 
   tick() {
-    // Figure out which faces are inverted
-    let invertedFaces = new Set<number>();
-    for (let face of this.graph.faces()) {
-      if (this.signedArea(face) < 0) {
-        invertedFaces.add(face);
-      }
-    }
-
     // We use a model of different forces to produce an embedding of
     // the graph that looks continuous, while also permitting change
     // over time.
