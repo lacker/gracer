@@ -4,6 +4,8 @@ import * as THREE from "three";
 
 import EmbeddedGraph from "./EmbeddedGraph";
 
+let GLOBAL_Z = 4;
+
 function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
   let v = props.graph.position(props.vertex);
   let mesh = useRef<any>();
@@ -17,7 +19,12 @@ function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
   });
   let color = props.vertex === 1 ? "#000000" : "#0000ff";
   return (
-    <mesh ref={mesh} visible position={[v.x, v.y, 0]} rotation={[0, 0, 0]}>
+    <mesh
+      ref={mesh}
+      visible
+      position={[v.x, v.y, GLOBAL_Z]}
+      rotation={[0, 0, 0]}
+    >
       <sphereGeometry attach="geometry" args={[0.2, 8, 8]} />
       <meshLambertMaterial color={color} attach="material" />
     </mesh>
@@ -57,7 +64,7 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     <mesh
       ref={mesh}
       visible
-      position={[x, y, 0]}
+      position={[x, y, GLOBAL_Z]}
       rotation={[0, 0, angle]}
       scale={[dist, 1, 1]}
       geometry={geometry}
