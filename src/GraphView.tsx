@@ -75,8 +75,11 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
 }
 
 function LiveGraphView(props: { graph: EmbeddedGraph; forceUpdate: number }) {
-  useFrame(() => {
+  useFrame(({ camera }) => {
     props.graph.tick();
+
+    camera.position.x += 0.01;
+    camera.updateProjectionMatrix();
   });
 
   return (
