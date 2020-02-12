@@ -24,9 +24,8 @@ export default function App() {
         graph.rightClick();
       }}
       resize={{ scroll: false }}
-      orthographic
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
-      camera={{ zoom: 50 }}
+      camera={{ position: [0, 0, 20] }}
     >
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
