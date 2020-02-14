@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "react-three-fiber";
 import "./App.css";
 
@@ -7,8 +7,8 @@ import GraphView from "./GraphView";
 import PlanarGraph from "./PlanarGraph";
 
 function Camera(props: any) {
-  const ref = useRef<any>();
-  const { setDefaultCamera } = useThree();
+  let ref = useRef<any>();
+  let { setDefaultCamera } = useThree();
   useEffect(
     () => {
       setDefaultCamera(ref.current);
@@ -23,10 +23,12 @@ function DraggableCanvas(props: {
   graph: PlanarGraph;
   embedded: EmbeddedGraph;
 }) {
+  let [shift, setShift] = useState(0);
+
   return (
     <Canvas
       onClick={() => {
-        props.graph.leftClick();
+        setShift(shift + 0.1);
       }}
       onContextMenu={e => {
         e.preventDefault();
@@ -35,7 +37,7 @@ function DraggableCanvas(props: {
       resize={{ scroll: false }}
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
     >
-      <Camera position={[0, 0, 30]} />
+      <Camera position={[shift, 0, 30]} />
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
       <GraphView graph={props.embedded} />
