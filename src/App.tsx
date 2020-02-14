@@ -15,7 +15,32 @@ function Camera(props: any) {
     },
     [setDefaultCamera]
   );
+
   return <perspectiveCamera ref={ref} {...props} />;
+}
+
+function DraggableCanvas(props: {
+  graph: PlanarGraph;
+  embedded: EmbeddedGraph;
+}) {
+  return (
+    <Canvas
+      onClick={() => {
+        props.graph.leftClick();
+      }}
+      onContextMenu={e => {
+        e.preventDefault();
+        props.graph.rightClick();
+      }}
+      resize={{ scroll: false }}
+      style={{ height: "100vh", backgroundColor: "#eeeeee" }}
+    >
+      <Camera position={[0, 0, 30]} />
+      <pointLight position={[-20, 50, 100]} />
+      <ambientLight intensity={0.5} />
+      <GraphView graph={props.embedded} />
+    </Canvas>
+  );
 }
 
 export default function App() {
@@ -24,24 +49,7 @@ export default function App() {
 
   setInterval(() => {
     graph.mutate();
-  }, 100);
+  }, 1000);
 
-  return (
-    <Canvas
-      onClick={() => {
-        graph.leftClick();
-      }}
-      onContextMenu={e => {
-        e.preventDefault();
-        graph.rightClick();
-      }}
-      resize={{ scroll: false }}
-      style={{ height: "100vh", backgroundColor: "#eeeeee" }}
-    >
-      <Camera position={[0, 0, 20]} />
-      <pointLight position={[-20, 50, 100]} />
-      <ambientLight intensity={0.5} />
-      <GraphView graph={embedded} />
-    </Canvas>
-  );
+  return <DraggableCanvas graph={graph} embedded={embedded} />;
 }

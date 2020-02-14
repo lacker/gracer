@@ -542,7 +542,7 @@ export default class PlanarGraph {
   }
 
   leftClick() {
-    this.randomlyStellate();
+    console.log("ignoring left click");
   }
 
   rightClick() {
