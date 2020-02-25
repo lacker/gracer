@@ -1,8 +1,9 @@
 import React, { useRef } from "react";
-import { ReactThreeFiber, extend, useThree, useFrame } from "react-three-fiber";
+import { extend, useThree, useFrame } from "react-three-fiber";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 /* eslint-disable */
+import { ReactThreeFiber } from "react-three-fiber";
 declare global {
   namespace JSX {
     interface IntrinsicElements {
