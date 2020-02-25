@@ -2,21 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "react-three-fiber";
 import "./App.css";
 
+import Controls from "./Controls";
 import EmbeddedGraph from "./EmbeddedGraph";
 import GraphView from "./GraphView";
 import PlanarGraph from "./PlanarGraph";
 
 function Camera(props: any) {
-  let ref = useRef<any>();
+  let camera = useRef<any>();
   let { setDefaultCamera } = useThree();
-  useEffect(
-    () => {
-      setDefaultCamera(ref.current);
-    },
-    [setDefaultCamera]
-  );
+  useEffect(() => {
+    setDefaultCamera(camera.current);
+  }, [setDefaultCamera]);
 
-  return <perspectiveCamera ref={ref} {...props} />;
+  return <perspectiveCamera ref={camera} {...props} />;
 }
 
 function DraggableCanvas(props: {
@@ -28,11 +26,11 @@ function DraggableCanvas(props: {
   return (
     <Canvas
       onClick={() => {
-        setShift(shift + 0.1);
+        console.log("ignoring left click");
       }}
       onContextMenu={e => {
         e.preventDefault();
-        props.graph.rightClick();
+        setShift(shift + 0.1);
       }}
       resize={{ scroll: false }}
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
@@ -41,6 +39,7 @@ function DraggableCanvas(props: {
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
       <GraphView graph={props.embedded} />
+      <Controls />
     </Canvas>
   );
 }
