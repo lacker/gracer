@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Canvas, useThree } from "react-three-fiber";
 import "./App.css";
 
@@ -21,21 +21,18 @@ function DraggableCanvas(props: {
   graph: PlanarGraph;
   embedded: EmbeddedGraph;
 }) {
-  let [shift, setShift] = useState(0);
-
   return (
     <Canvas
       onClick={() => {
         console.log("ignoring left click");
       }}
       onContextMenu={e => {
-        e.preventDefault();
-        setShift(shift + 0.1);
+        props.graph.rightClick();
       }}
       resize={{ scroll: false }}
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}
     >
-      <Camera position={[shift, 0, 30]} />
+      <Camera position={[0, 0, 30]} />
       <pointLight position={[-20, 50, 100]} />
       <ambientLight intensity={0.5} />
       <GraphView graph={props.embedded} />
