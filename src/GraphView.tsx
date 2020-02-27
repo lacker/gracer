@@ -6,6 +6,15 @@ import EmbeddedGraph from "./EmbeddedGraph";
 
 let GLOBAL_Z = 4;
 
+function CenterDot() {
+  return (
+    <mesh visible position={[0, 0, 0]}>
+      <sphereGeometry attach="geometry" args={[0.1, 8, 8]} />
+      <meshLambertMaterial color={"#000000"} attach="material" />
+    </mesh>
+  );
+}
+
 function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
   let v = props.graph.position(props.vertex);
   let mesh = useRef<any>();
@@ -83,6 +92,7 @@ function LiveGraphView(props: { graph: EmbeddedGraph; forceUpdate: number }) {
 
   return (
     <>
+      <CenterDot />
       {props.graph.vertices().map(v => (
         <Ball graph={props.graph} vertex={v} key={`v${v}`} />
       ))}
