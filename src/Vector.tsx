@@ -53,6 +53,14 @@ export default class Vector {
     return this.scale(k / len);
   }
 
+  cross(other: Vector): Vector {
+    return new Vector(
+      this.y * other.z - this.z * other.y,
+      this.z * other.x - this.x * other.z,
+      this.x * other.y - this.y * other.x
+    );
+  }
+
   // Rotates anticlockwise around the z-axis.
   rotate(radians: number): Vector {
     return new Vector(
