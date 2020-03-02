@@ -4,8 +4,6 @@ import * as THREE from "three";
 
 import EmbeddedGraph from "./EmbeddedGraph";
 
-let GLOBAL_Z = 4;
-
 function CenterDot() {
   return (
     <mesh visible position={[0, 0, 0]}>
@@ -25,15 +23,11 @@ function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
     }
     mesh.current.position.x = v.x;
     mesh.current.position.y = v.y;
+    mesh.current.position.z = v.z;
   });
   let color = props.vertex === 1 ? "#000000" : "#0000ff";
   return (
-    <mesh
-      ref={mesh}
-      visible
-      position={[v.x, v.y, GLOBAL_Z]}
-      rotation={[0, 0, 0]}
-    >
+    <mesh ref={mesh} visible position={[v.x, v.y, v.z]} rotation={[0, 0, 0]}>
       <sphereGeometry attach="geometry" args={[0.2, 8, 8]} />
       <meshLambertMaterial color={color} attach="material" />
     </mesh>
@@ -47,11 +41,13 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     let v2 = props.graph.position(vn2);
     let x = (v1.x + v2.x) / 2;
     let y = (v1.y + v2.y) / 2;
+    let z = (v1.z + v2.z) / 2;
     let dx = v2.x - v1.x;
     let dy = v2.y - v1.y;
-    let dist = Math.sqrt(dx * dx + dy * dy);
+    let dz = v2.z - v1.z;
+    let dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
     let angle = Math.atan2(dy, dx);
-    return { x, y, angle, dist };
+    return { x, y, z, angle, dist };
   };
 
   let mesh = useRef<any>();
@@ -59,21 +55,22 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     if (!mesh.current) {
       return;
     }
-    let { x, y, angle, dist } = calculate();
+    let { x, y, z, angle, dist } = calculate();
     mesh.current.position.x = x;
     mesh.current.position.y = y;
+    mesh.current.position.z = z;
     mesh.current.scale.x = dist;
     mesh.current.rotation.z = angle;
   });
 
-  let { x, y, angle, dist } = calculate();
+  let { x, y, z, angle, dist } = calculate();
   let geometry = new THREE.BoxGeometry(1, 0.1, 0.1);
 
   return (
     <mesh
       ref={mesh}
       visible
-      position={[x, y, GLOBAL_Z]}
+      position={[x, y, z]}
       rotation={[0, 0, angle]}
       scale={[dist, 1, 1]}
       geometry={geometry}
