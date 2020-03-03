@@ -27,10 +27,8 @@ export default class EmbeddedGraph {
       }
       if (num >= 2) {
         answer = sum.scale(1 / num).add(Vector.epsilon());
-      } else if (num === 1) {
-        answer = Vector.random();
       } else {
-        answer = Vector.zero();
+        answer = Vector.random();
       }
       this.positions.set(v, answer);
     }
@@ -140,8 +138,9 @@ export default class EmbeddedGraph {
     }
 
     if (this.positions.has(1)) {
-      // Keep vertex 1 in the center
-      let shift = this.position(1).scale(-1);
+      // Keep vertex 1 in a fixed place
+      let target = new Vector(0, 0, 4);
+      let shift = target.sub(this.position(1));
       for (let [vertex, position] of this.positions.entries()) {
         this.positions.set(vertex, position.add(shift));
       }
