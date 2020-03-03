@@ -20,7 +20,11 @@ export default class Vector {
   }
 
   static epsilon(): Vector {
-    return new Vector(0.01 * Math.random(), 0.01 * Math.random(), 0);
+    return new Vector(
+      0.01 * Math.random(),
+      0.01 * Math.random(),
+      0.01 * Math.random()
+    );
   }
 
   static random(): Vector {
