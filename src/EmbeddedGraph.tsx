@@ -2,6 +2,8 @@ import PlanarGraph from "./PlanarGraph";
 import { pairs } from "./Util";
 import Vector from "./Vector";
 
+const RADIUS = 4;
+
 export default class EmbeddedGraph {
   graph: PlanarGraph;
   positions: Map<number, Vector>;
@@ -140,7 +142,7 @@ export default class EmbeddedGraph {
 
     if (this.positions.has(1)) {
       // Keep vertex 1 in a fixed place
-      let target = new Vector(0, 0, 4);
+      let target = new Vector(0, 0, RADIUS);
       let shift = target.sub(this.position(1));
       for (let [vertex, position] of this.positions.entries()) {
         this.positions.set(vertex, position.add(shift));
