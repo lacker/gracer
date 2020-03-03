@@ -3,6 +3,7 @@ import { useFrame } from "react-three-fiber";
 import * as THREE from "three";
 
 import EmbeddedGraph from "./EmbeddedGraph";
+import Vector from "./Vector";
 
 function CenterDot() {
   return (
@@ -40,10 +41,13 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     let v1 = props.graph.position(vn1);
     let v2 = props.graph.position(vn2);
     let delta = v2.sub(v1);
-    let dist = delta.length();
+    let distance = delta.length();
     let center = v1.add(v2).scale(0.5);
-    let angle = Math.atan2(delta.y, delta.x);
-    return { center, angle, dist };
+    let normalX = new Vector(1, 0, 0);
+    let normalD = delta.normalize();
+    let quaternion = new THREE.Quaternion();
+    quaternion.setFromUnitVectors(normalX.toVector3(), normalD.toVector3());
+    return { center, quaternion, distance };
   };
 
   let mesh = useRef<any>();
@@ -51,15 +55,20 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     if (!mesh.current) {
       return;
     }
-    let { center, angle, dist } = calculate();
+    let { center, quaternion, distance } = calculate();
     mesh.current.position.x = center.x;
     mesh.current.position.y = center.y;
     mesh.current.position.z = center.z;
-    mesh.current.scale.x = dist;
-    mesh.current.rotation.z = angle;
+    mesh.current.scale.x = distance;
+    mesh.current.quaternion.set(
+      quaternion.x,
+      quaternion.y,
+      quaternion.z,
+      quaternion.w
+    );
   });
 
-  let { center, angle, dist } = calculate();
+  let { center, quaternion, distance } = calculate();
   let geometry = new THREE.BoxGeometry(1, 0.1, 0.1);
 
   return (
@@ -67,8 +76,8 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
       ref={mesh}
       visible
       position={[center.x, center.y, center.z]}
-      rotation={[0, 0, angle]}
-      scale={[dist, 1, 1]}
+      quaternion={quaternion}
+      scale={[distance, 1, 1]}
       geometry={geometry}
     >
       <meshLambertMaterial color="#777777" attach="material" />
