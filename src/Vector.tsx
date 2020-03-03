@@ -28,7 +28,11 @@ export default class Vector {
   }
 
   static random(): Vector {
-    return new Vector(-10 + 20 * Math.random(), -10 + 20 * Math.random(), 0);
+    return new Vector(
+      -10 + 20 * Math.random(),
+      -10 + 20 * Math.random(),
+      -10 + 20 * Math.random()
+    );
   }
 
   add(other: Vector): Vector {
