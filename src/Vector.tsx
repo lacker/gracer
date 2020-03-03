@@ -68,13 +68,4 @@ export default class Vector {
       this.x * other.y - this.y * other.x
     );
   }
-
-  // Rotates anticlockwise around the z-axis.
-  rotate(radians: number): Vector {
-    return new Vector(
-      Math.cos(radians) * this.x - Math.sin(radians) * this.y,
-      Math.sin(radians) * this.x + Math.cos(radians) * this.y,
-      this.z
-    );
-  }
 }
