@@ -90,10 +90,11 @@ export default class EmbeddedGraph {
         let pos2 = this.position(v2);
         let diff = pos2.sub(pos1);
         let lineMass = diff.length();
-        let unit = diff.scaleTo(1);
+
         // Since the face is on the right, the direction of repulsion
-        // is to the right of the edge.
-        let direction = unit.rotate(-Math.PI / 2);
+        // is to the right of the edge, when looking from infinity
+        // through the edge to the origin.
+        let direction = diff.cross(pos1).normalize();
 
         let base1 = direction.dot(pos1);
         let base2 = direction.dot(pos2);
