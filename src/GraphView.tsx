@@ -39,15 +39,11 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     let [vn1, vn2] = props.edge;
     let v1 = props.graph.position(vn1);
     let v2 = props.graph.position(vn2);
-    let x = (v1.x + v2.x) / 2;
-    let y = (v1.y + v2.y) / 2;
-    let z = (v1.z + v2.z) / 2;
-    let dx = v2.x - v1.x;
-    let dy = v2.y - v1.y;
-    let dz = v2.z - v1.z;
-    let dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-    let angle = Math.atan2(dy, dx);
-    return { x, y, z, angle, dist };
+    let delta = v2.sub(v1);
+    let dist = delta.length();
+    let center = v1.add(v2).scale(0.5);
+    let angle = Math.atan2(delta.y, delta.x);
+    return { center, angle, dist };
   };
 
   let mesh = useRef<any>();
@@ -55,22 +51,22 @@ function Rod(props: { graph: EmbeddedGraph; edge: number[] }) {
     if (!mesh.current) {
       return;
     }
-    let { x, y, z, angle, dist } = calculate();
-    mesh.current.position.x = x;
-    mesh.current.position.y = y;
-    mesh.current.position.z = z;
+    let { center, angle, dist } = calculate();
+    mesh.current.position.x = center.x;
+    mesh.current.position.y = center.y;
+    mesh.current.position.z = center.z;
     mesh.current.scale.x = dist;
     mesh.current.rotation.z = angle;
   });
 
-  let { x, y, z, angle, dist } = calculate();
+  let { center, angle, dist } = calculate();
   let geometry = new THREE.BoxGeometry(1, 0.1, 0.1);
 
   return (
     <mesh
       ref={mesh}
       visible
-      position={[x, y, z]}
+      position={[center.x, center.y, center.z]}
       rotation={[0, 0, angle]}
       scale={[dist, 1, 1]}
       geometry={geometry}
