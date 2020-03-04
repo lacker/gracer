@@ -67,6 +67,12 @@ export default class EmbeddedGraph {
       let old = forcemap.get(v) || Vector.zero();
       forcemap.set(v, old.add(force));
     };
+    let pushTo = (v: number, target: Vector) => {
+      let current = this.position(v);
+      let linear = target.sub(current);
+      let quadratic = linear.scale(0.5 * linear.length());
+      addForce(v, quadratic);
+    };
 
     // Spring forces
     for (let [v1, v2] of this.graph.edgesBothWays()) {
@@ -75,12 +81,25 @@ export default class EmbeddedGraph {
       let pos2 = this.position(v2);
       let diff = pos2.sub(pos1);
       let target = pos1.add(diff.scaleTo(1));
-      let linear = target.sub(pos2);
-      let quadraticForce = linear.scale(0.5 * linear.length());
-      addForce(v2, quadraticForce);
+      pushTo(v2, target);
     }
 
-    // Forces between edges and vertices of the same face
+    // Push each vertex towards the average distance from the origin of its neighbors
+    /*
+    for (let v of this.graph.vertices()) {
+      let sum = 0;
+      let count = 0;
+      for (let neighbor of this.graph.neighbors(v)) {
+	sum += this.position(neighbor).length();
+	count += 1;
+      }
+      let targetDistance = sum / count;
+      let target = this.position(v).scaleTo(targetDistance);
+      // XXX
+    }
+*/
+
+    // Face-expansion forces, that try to orient each face
     for (let face of this.graph.faces()) {
       if (face === 0) {
         continue;
