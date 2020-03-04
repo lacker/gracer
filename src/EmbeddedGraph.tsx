@@ -85,19 +85,17 @@ export default class EmbeddedGraph {
     }
 
     // Push each vertex towards the average distance from the origin of its neighbors
-    /*
     for (let v of this.graph.vertices()) {
       let sum = 0;
       let count = 0;
       for (let neighbor of this.graph.neighbors(v)) {
-	sum += this.position(neighbor).length();
-	count += 1;
+        sum += this.position(neighbor).length();
+        count += 1;
       }
       let targetDistance = sum / count;
       let target = this.position(v).scaleTo(targetDistance);
-      // XXX
+      pushTo(v, target);
     }
-*/
 
     // Face-expansion forces, that try to orient each face
     for (let face of this.graph.faces()) {
