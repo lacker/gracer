@@ -54,7 +54,31 @@ export default class EmbeddedGraph {
     return sum.scale(num);
   }
 
+  rightClick() {
+    /*
+    for (let v of this.graph.vertices()) {
+      console.log(this.position(v));
+    }
+    */
+  }
+
+  centralize() {
+    // Translate so that the centroid is the origin
+    let sum = Vector.zero();
+    let num = 0;
+    for (let v of this.graph.vertices()) {
+      sum = sum.add(this.position(v));
+      num += 1;
+    }
+    let shift = sum.scale(-1 / num);
+    for (let v of this.graph.vertices()) {
+      this.positions.set(v, this.position(v).add(shift));
+    }
+  }
+
   tick() {
+    this.centralize();
+
     // We use a model of different forces to produce an embedding of
     // the graph that looks continuous, while also permitting change
     // over time.

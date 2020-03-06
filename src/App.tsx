@@ -28,6 +28,7 @@ function DraggableCanvas(props: {
       }}
       onContextMenu={e => {
         props.graph.rightClick();
+        props.embedded.rightClick();
       }}
       resize={{ scroll: false }}
       style={{ height: "100vh", backgroundColor: "#eeeeee" }}

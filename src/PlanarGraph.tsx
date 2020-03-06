@@ -531,11 +531,11 @@ export default class PlanarGraph {
   }
 
   leftClick() {
-    console.log("ignoring left click");
+    // console.log("ignoring left click");
   }
 
   rightClick() {
-    this.togglePause();
+    // this.togglePause();
   }
 
   announceUpdate() {
