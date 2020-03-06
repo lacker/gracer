@@ -526,7 +526,7 @@ export default class PlanarGraph {
       return;
     }
     if (Math.random() < 0.05 || !this.randomlyRotateEdge()) {
-      this.randomlyAddOuterTriangle();
+      this.randomlyStellate();
     }
   }
 

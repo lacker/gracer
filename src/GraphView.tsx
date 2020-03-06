@@ -26,7 +26,7 @@ function Ball(props: { graph: EmbeddedGraph; vertex: number }) {
     mesh.current.position.y = v.y;
     mesh.current.position.z = v.z;
   });
-  let color = props.vertex === 1 ? "#000000" : "#0000ff";
+  let color = "#0000ff";
   return (
     <mesh ref={mesh} visible position={[v.x, v.y, v.z]} rotation={[0, 0, 0]}>
       <sphereGeometry attach="geometry" args={[0.2, 8, 8]} />
