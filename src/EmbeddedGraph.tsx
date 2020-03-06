@@ -2,8 +2,6 @@ import PlanarGraph from "./PlanarGraph";
 import { pairs } from "./Util";
 import Vector from "./Vector";
 
-const RADIUS = 4;
-
 export default class EmbeddedGraph {
   graph: PlanarGraph;
   positions: Map<number, Vector>;
