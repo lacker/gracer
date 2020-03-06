@@ -99,9 +99,6 @@ export default class EmbeddedGraph {
 
     // Face-expansion forces, that try to orient each face
     for (let face of this.graph.faces()) {
-      if (face === 0) {
-        continue;
-      }
       let boundary = this.graph.getBoundary(face);
       for (let [v1, v2] of pairs(boundary)) {
         // Check if the v1-v2 edge should repulse v3
@@ -155,15 +152,6 @@ export default class EmbeddedGraph {
         continue;
       }
       this.positions.set(vertex, this.position(vertex).add(force));
-    }
-
-    if (this.positions.has(1)) {
-      // Keep vertex 1 in a fixed place
-      let target = new Vector(0, 0, RADIUS);
-      let shift = target.sub(this.position(1));
-      for (let [vertex, position] of this.positions.entries()) {
-        this.positions.set(vertex, position.add(shift));
-      }
     }
   }
 }

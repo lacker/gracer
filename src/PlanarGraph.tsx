@@ -49,10 +49,8 @@ function intersect(list1: number[], list2: number[]): number[] {
 }
 
 // Zero is the best achievable score for a vertex.
-// The ideal, "flat" state of a vertex is to have degree 5 or 6.
-// Being on the outer face counts for 2 degree, so the ideal degree
-// of a vertex on the outer face is 3 or 4.
-function scoreForPseudodegree(pd: number): number {
+// The ideal, "flat-ish" state of a vertex is to have degree 5 or 6.
+function scoreForDegree(pd: number): number {
   if (pd < 5) {
     return pd - 5;
   }
@@ -461,20 +459,11 @@ export default class PlanarGraph {
     return boundary[nextIndex];
   }
 
-  // Being on the outer face counts as +2, for pseudodegree
-  pseudodegree(v: number): number {
-    let answer = this.degree(v);
-    if (this.getBoundary(0).includes(v)) {
-      answer += 2;
-    }
-    return answer;
-  }
-
-  // The change in score that comes from changing the pseudodegree
+  // The change in score that comes from changing the degree
   // of this vertex by the given amount.
   deltaScore(vertex: number, delta: number): number {
-    let degree = this.pseudodegree(vertex);
-    return scoreForPseudodegree(degree + delta) - scoreForPseudodegree(degree);
+    let degree = this.degree(vertex);
+    return scoreForDegree(degree + delta) - scoreForDegree(degree);
   }
 
   // Returns true if we rotated the edge.
