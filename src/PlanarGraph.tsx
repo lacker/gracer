@@ -62,7 +62,7 @@ function scoreForDegree(pd: number): number {
 
 // PlanarGraph has some minimum requirements for its graphs.
 // The graph must be connected.
-// Each face must have at least three vertices, including the outer face.
+// Each face must have at least three vertices.
 // Vertices on a face may not be repeated.
 // Two vertices may be connected by at most one edge.
 // The minimum PlanarGraph is thus a triangle.
@@ -74,7 +74,6 @@ export default class PlanarGraph {
 
   // Each face has a numerical id.
   // facemap gives you its vertices, in clockwise order.
-  // Face zero is special - it is the outer face, and may not be deleted.
   // Its vertices will seem to be listed counterclockwise on a single
   // plane, because it's like you're looking at the backside of a
   // sphere.
@@ -152,8 +151,7 @@ export default class PlanarGraph {
     return blank;
   }
 
-  // Returns all vertices that share an inner face with this vertex.
-  // This does not count the outer face.
+  // Returns all vertices that share a face with this vertex.
   cofacial(v: number): number[] {
     let answer = new Set<number>();
     for (let neighbor of this.neighbors(v)) {
@@ -274,9 +272,6 @@ export default class PlanarGraph {
 
   // Put a vertex in the middle of a face
   stellate(face: number) {
-    if (face === 0) {
-      throw new Error("cannot stellate the outer face");
-    }
     let boundary = this.getBoundary(face);
     let v = this.addRawVertex();
     this.facemap.delete(face);
@@ -287,42 +282,14 @@ export default class PlanarGraph {
   }
 
   randomlyStellate() {
-    // Find a non-outer face
+    // Find a random face
     let edges = this.shuffleEdges();
     for (let [v1, v2] of edges) {
       let face = this.getEdge(v1, v2).right;
-      if (face === 0) {
-        continue;
-      }
       this.stellate(face);
       return;
     }
     throw new Error("could not find a face to stellate");
-  }
-
-  // v1-v2's right must be the outer edge
-  addOuterTriangle(v1: number, v2: number) {
-    let edge = this.getEdge(v1, v2);
-    if (edge.right !== 0) {
-      throw new Error("addOuterTriangle must be called on outer edges");
-    }
-    let boundary = this.getBoundary(0);
-    let chopped = chopCircle(boundary, v2, v1);
-    if (chopped.length !== boundary.length) {
-      throw new Error("nonadjacent vertices in addOuterTriangle");
-    }
-    let vertex = this.addRawVertex();
-    chopped.push(vertex);
-    this.addRawFace([v1, v2, vertex]);
-    this.setRawFace(0, chopped);
-    this.announceUpdate();
-  }
-
-  randomlyAddOuterTriangle() {
-    let boundary = this.getBoundary(0);
-    let edges = pairs(boundary);
-    let [v1, v2] = edges[Math.floor(Math.random() * edges.length)];
-    this.addOuterTriangle(v1, v2);
   }
 
   // Adds an edge to split the given face, between the given two
@@ -397,7 +364,7 @@ export default class PlanarGraph {
     this.getVertexMap(v2).delete(v1);
 
     // Create a new face by zipping left and right together
-    // Reuse the lower face id so it works with the outer face
+    // Reuse the lower face id
     let newFace = Math.min(edge.left, edge.right);
     let leftPart = chopCircle(left, v1, v2);
     leftPart.pop();
@@ -469,9 +436,6 @@ export default class PlanarGraph {
   // Returns true if we rotated the edge.
   maybeRotateEdge(v1: number, v2: number): boolean {
     let edge = this.getEdge(v1, v2);
-    if (edge.left === 0 || edge.right === 0) {
-      return false;
-    }
     if (!this.canRemoveEdge(v1, v2)) {
       return false;
     }
